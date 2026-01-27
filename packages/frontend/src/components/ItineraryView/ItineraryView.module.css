@@ -1,0 +1,194 @@
+.container {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin: 16px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.titleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.cityName {
+  color: #3b82f6;
+}
+
+.duration {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.addButton {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.addButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.dayHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dayHeader:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.dayInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dayNumber {
+  font-weight: 700;
+  font-size: 14px;
+  color: #3b82f6;
+  background: #dbeafe;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.dayTheme {
+  font-weight: 600;
+  font-size: 15px;
+  color: #334155;
+}
+
+.expandIcon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.activities {
+  padding: 16px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity {
+  display: flex;
+  gap: 16px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+}
+
+.activityTime {
+  flex-shrink: 0;
+  width: 80px;
+}
+
+.timeLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.activityContent {
+  flex: 1;
+}
+
+.activityName {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.activityDescription {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.vibeTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.vibeTag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 10px;
+}

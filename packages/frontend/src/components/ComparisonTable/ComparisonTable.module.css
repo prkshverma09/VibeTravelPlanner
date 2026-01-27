@@ -1,0 +1,203 @@
+.container {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.closeButton:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.attributeHeader {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.cityHeader {
+  text-align: center;
+  padding: 12px;
+  border-bottom: 2px solid #e2e8f0;
+  min-width: 150px;
+}
+
+.cityInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cityImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cityName {
+  font-weight: 700;
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.countryName {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.attributeCell {
+  padding: 12px;
+  font-weight: 500;
+  color: #475569;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.valueCell {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s;
+}
+
+.highestCell {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.scoreContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.scoreBar {
+  width: 60px;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.scoreFill {
+  height: 100%;
+  background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.scoreFill.highest {
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+}
+
+.scoreValue {
+  font-weight: 600;
+  font-size: 14px;
+  color: #64748b;
+  min-width: 24px;
+}
+
+.highestValue {
+  color: #16a34a;
+}
+
+.textValue {
+  font-size: 14px;
+  color: #475569;
+}
+
+.vibeTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.vibeTag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 12px;
+}
+
+.recommendation {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.recommendation strong {
+  color: #78350f;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.selectButton {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.selectButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.selectButton:active {
+  transform: translateY(0);
+}

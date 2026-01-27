@@ -1,0 +1,422 @@
+[
+  {
+    "city": "Tokyo",
+    "country": "Japan",
+    "continent": "Asia",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "Spring (March-May) or Fall (September-November)"
+  },
+  {
+    "city": "Kyoto",
+    "country": "Japan",
+    "continent": "Asia",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "Spring (March-May) or Fall (October-November)"
+  },
+  {
+    "city": "Seoul",
+    "country": "South Korea",
+    "continent": "Asia",
+    "climate_type": "Humid continental",
+    "best_time_to_visit": "Spring (April-May) or Fall (September-October)"
+  },
+  {
+    "city": "Bangkok",
+    "country": "Thailand",
+    "continent": "Asia",
+    "climate_type": "Tropical savanna",
+    "best_time_to_visit": "November to February"
+  },
+  {
+    "city": "Singapore",
+    "country": "Singapore",
+    "continent": "Asia",
+    "climate_type": "Tropical rainforest",
+    "best_time_to_visit": "February to April"
+  },
+  {
+    "city": "Hong Kong",
+    "country": "China",
+    "continent": "Asia",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "October to December"
+  },
+  {
+    "city": "Shanghai",
+    "country": "China",
+    "continent": "Asia",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "Spring (April-May) or Fall (September-October)"
+  },
+  {
+    "city": "Beijing",
+    "country": "China",
+    "continent": "Asia",
+    "climate_type": "Humid continental",
+    "best_time_to_visit": "September to October"
+  },
+  {
+    "city": "Bali",
+    "country": "Indonesia",
+    "continent": "Asia",
+    "climate_type": "Tropical monsoon",
+    "best_time_to_visit": "April to October"
+  },
+  {
+    "city": "Mumbai",
+    "country": "India",
+    "continent": "Asia",
+    "climate_type": "Tropical wet and dry",
+    "best_time_to_visit": "November to February"
+  },
+  {
+    "city": "Paris",
+    "country": "France",
+    "continent": "Europe",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "Spring (April-June) or Fall (September-October)"
+  },
+  {
+    "city": "London",
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "May to September"
+  },
+  {
+    "city": "Rome",
+    "country": "Italy",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "April to June or September to October"
+  },
+  {
+    "city": "Barcelona",
+    "country": "Spain",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "May to June or September to October"
+  },
+  {
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "continent": "Europe",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "April to May or September"
+  },
+  {
+    "city": "Berlin",
+    "country": "Germany",
+    "continent": "Europe",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "May to September"
+  },
+  {
+    "city": "Prague",
+    "country": "Czech Republic",
+    "continent": "Europe",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "April to May or September to October"
+  },
+  {
+    "city": "Vienna",
+    "country": "Austria",
+    "continent": "Europe",
+    "climate_type": "Continental",
+    "best_time_to_visit": "April to May or September to October"
+  },
+  {
+    "city": "Lisbon",
+    "country": "Portugal",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "March to May or September to October"
+  },
+  {
+    "city": "Athens",
+    "country": "Greece",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "April to June or September to October"
+  },
+  {
+    "city": "Reykjavik",
+    "country": "Iceland",
+    "continent": "Europe",
+    "climate_type": "Subpolar oceanic",
+    "best_time_to_visit": "June to August"
+  },
+  {
+    "city": "Copenhagen",
+    "country": "Denmark",
+    "continent": "Europe",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "May to August"
+  },
+  {
+    "city": "Stockholm",
+    "country": "Sweden",
+    "continent": "Europe",
+    "climate_type": "Humid continental",
+    "best_time_to_visit": "May to September"
+  },
+  {
+    "city": "New York",
+    "country": "United States",
+    "continent": "North America",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "April to June or September to November"
+  },
+  {
+    "city": "Los Angeles",
+    "country": "United States",
+    "continent": "North America",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "March to May or September to November"
+  },
+  {
+    "city": "San Francisco",
+    "country": "United States",
+    "continent": "North America",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "September to November"
+  },
+  {
+    "city": "Miami",
+    "country": "United States",
+    "continent": "North America",
+    "climate_type": "Tropical monsoon",
+    "best_time_to_visit": "December to May"
+  },
+  {
+    "city": "New Orleans",
+    "country": "United States",
+    "continent": "North America",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "February to May"
+  },
+  {
+    "city": "Chicago",
+    "country": "United States",
+    "continent": "North America",
+    "climate_type": "Humid continental",
+    "best_time_to_visit": "April to May or September to October"
+  },
+  {
+    "city": "Toronto",
+    "country": "Canada",
+    "continent": "North America",
+    "climate_type": "Humid continental",
+    "best_time_to_visit": "May to October"
+  },
+  {
+    "city": "Vancouver",
+    "country": "Canada",
+    "continent": "North America",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "June to August"
+  },
+  {
+    "city": "Mexico City",
+    "country": "Mexico",
+    "continent": "North America",
+    "climate_type": "Subtropical highland",
+    "best_time_to_visit": "March to May"
+  },
+  {
+    "city": "Cancun",
+    "country": "Mexico",
+    "continent": "North America",
+    "climate_type": "Tropical wet and dry",
+    "best_time_to_visit": "December to April"
+  },
+  {
+    "city": "Havana",
+    "country": "Cuba",
+    "continent": "North America",
+    "climate_type": "Tropical wet and dry",
+    "best_time_to_visit": "November to April"
+  },
+  {
+    "city": "Buenos Aires",
+    "country": "Argentina",
+    "continent": "South America",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "September to November or March to May"
+  },
+  {
+    "city": "Rio de Janeiro",
+    "country": "Brazil",
+    "continent": "South America",
+    "climate_type": "Tropical savanna",
+    "best_time_to_visit": "December to March"
+  },
+  {
+    "city": "São Paulo",
+    "country": "Brazil",
+    "continent": "South America",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "April to June or August to October"
+  },
+  {
+    "city": "Lima",
+    "country": "Peru",
+    "continent": "South America",
+    "climate_type": "Desert",
+    "best_time_to_visit": "December to April"
+  },
+  {
+    "city": "Cusco",
+    "country": "Peru",
+    "continent": "South America",
+    "climate_type": "Subtropical highland",
+    "best_time_to_visit": "May to September"
+  },
+  {
+    "city": "Cartagena",
+    "country": "Colombia",
+    "continent": "South America",
+    "climate_type": "Tropical wet and dry",
+    "best_time_to_visit": "December to April"
+  },
+  {
+    "city": "Medellín",
+    "country": "Colombia",
+    "continent": "South America",
+    "climate_type": "Subtropical highland",
+    "best_time_to_visit": "December to March or June to September"
+  },
+  {
+    "city": "Santiago",
+    "country": "Chile",
+    "continent": "South America",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "September to November or March to May"
+  },
+  {
+    "city": "Cape Town",
+    "country": "South Africa",
+    "continent": "Africa",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "November to March"
+  },
+  {
+    "city": "Marrakech",
+    "country": "Morocco",
+    "continent": "Africa",
+    "climate_type": "Semi-arid",
+    "best_time_to_visit": "March to May or September to November"
+  },
+  {
+    "city": "Cairo",
+    "country": "Egypt",
+    "continent": "Africa",
+    "climate_type": "Hot desert",
+    "best_time_to_visit": "October to April"
+  },
+  {
+    "city": "Nairobi",
+    "country": "Kenya",
+    "continent": "Africa",
+    "climate_type": "Subtropical highland",
+    "best_time_to_visit": "June to October"
+  },
+  {
+    "city": "Zanzibar",
+    "country": "Tanzania",
+    "continent": "Africa",
+    "climate_type": "Tropical wet and dry",
+    "best_time_to_visit": "June to October"
+  },
+  {
+    "city": "Accra",
+    "country": "Ghana",
+    "continent": "Africa",
+    "climate_type": "Tropical savanna",
+    "best_time_to_visit": "November to March"
+  },
+  {
+    "city": "Sydney",
+    "country": "Australia",
+    "continent": "Oceania",
+    "climate_type": "Humid subtropical",
+    "best_time_to_visit": "September to November or March to May"
+  },
+  {
+    "city": "Melbourne",
+    "country": "Australia",
+    "continent": "Oceania",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "September to November or March to May"
+  },
+  {
+    "city": "Auckland",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "December to March"
+  },
+  {
+    "city": "Queenstown",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "December to February or June to August"
+  },
+  {
+    "city": "Fiji",
+    "country": "Fiji",
+    "continent": "Oceania",
+    "climate_type": "Tropical marine",
+    "best_time_to_visit": "May to October"
+  },
+  {
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "climate_type": "Hot desert",
+    "best_time_to_visit": "November to March"
+  },
+  {
+    "city": "Istanbul",
+    "country": "Turkey",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "April to May or September to November"
+  },
+  {
+    "city": "Budapest",
+    "country": "Hungary",
+    "continent": "Europe",
+    "climate_type": "Humid continental",
+    "best_time_to_visit": "March to May or September to November"
+  },
+  {
+    "city": "Dubrovnik",
+    "country": "Croatia",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "May to June or September to October"
+  },
+  {
+    "city": "Santorini",
+    "country": "Greece",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "April to June or September to October"
+  },
+  {
+    "city": "Amalfi",
+    "country": "Italy",
+    "continent": "Europe",
+    "climate_type": "Mediterranean",
+    "best_time_to_visit": "May to June or September to October"
+  },
+  {
+    "city": "Edinburgh",
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "climate_type": "Oceanic",
+    "best_time_to_visit": "May to September"
+  }
+]

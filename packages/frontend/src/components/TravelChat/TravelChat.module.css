@@ -1,0 +1,141 @@
+.chatContainer {
+  @apply w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden;
+}
+
+.chatHeader {
+  @apply bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white;
+}
+
+.chatHeaderTop {
+  @apply flex items-center justify-between mb-2;
+}
+
+.chatTitle {
+  @apply text-2xl font-bold;
+}
+
+.chatSubtitle {
+  @apply text-purple-100 text-sm;
+}
+
+.clearButton {
+  @apply px-3 py-1.5 text-sm font-medium text-purple-600 bg-white hover:bg-purple-50 rounded-lg transition-colors cursor-pointer border-0 shadow-sm;
+}
+
+.chatWidget {
+  @apply min-h-[400px];
+}
+
+.placeholder {
+  @apply flex flex-col items-center justify-center h-full min-h-[350px] text-gray-600 p-4;
+}
+
+.placeholderIcon {
+  @apply text-6xl mb-4;
+}
+
+.placeholderText {
+  @apply text-lg font-medium text-gray-500;
+}
+
+.placeholderSubtext {
+  @apply text-sm text-gray-600 mt-2;
+}
+
+.suggestedQueries {
+  @apply border-t border-gray-100 p-4;
+}
+
+.suggestedTitle {
+  @apply text-sm text-gray-500 mb-3;
+}
+
+.queryChips {
+  @apply flex flex-wrap gap-2;
+}
+
+.queryChip {
+  @apply px-3 py-1.5 text-sm bg-purple-50 text-purple-600 rounded-full hover:bg-purple-100 transition-colors cursor-pointer border-0;
+}
+
+/* User and Assistant Avatars */
+.userAvatar {
+  @apply w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-semibold flex-shrink-0;
+}
+
+.assistantAvatar {
+  @apply w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center text-lg flex-shrink-0;
+}
+
+.headerIcon {
+  @apply text-base;
+}
+
+/* Algolia Chat Root Styling */
+.algoliaChat {
+  @apply w-full min-h-[400px] flex flex-col;
+}
+
+.algoliaChatContainer {
+  @apply flex flex-col h-full;
+}
+
+/* Chat Header */
+.algoliaChatHeaderRoot {
+  @apply flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50;
+}
+
+.algoliaChatHeaderTitle {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.algoliaChatHeaderIcon {
+  @apply text-purple-500;
+}
+
+.algoliaChatHeaderButton {
+  @apply p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors;
+}
+
+/* Chat Messages Container */
+.algoliaChatMessages {
+  @apply flex-1 overflow-hidden;
+}
+
+.algoliaChatMessagesContent {
+  @apply p-4;
+}
+
+.algoliaChatMessagesScroll {
+  @apply max-h-[400px] overflow-y-auto space-y-4;
+}
+
+.algoliaChatScrollToBottom {
+  @apply absolute bottom-20 right-4 p-2 bg-white shadow-lg rounded-full text-gray-500 hover:text-gray-700 transition-colors;
+}
+
+/* Chat Prompt Area */
+.algoliaChatPrompt {
+  @apply border-t border-gray-100 p-4 bg-white;
+}
+
+.algoliaChatTextarea {
+  @apply w-full px-4 py-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder-gray-400;
+}
+
+.algoliaChatSubmit {
+  @apply p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+}
+
+.algoliaChatPromptFooter {
+  @apply text-xs text-gray-400 mt-2 text-center;
+}
+
+/* Tool Result Styles */
+.toolConfirmation {
+  @apply bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg text-sm font-medium my-2;
+}
+
+.toolLoading {
+  @apply bg-gray-50 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm animate-pulse my-2;
+}

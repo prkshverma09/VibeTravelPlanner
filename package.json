@@ -1,0 +1,28 @@
+{
+  "name": "vibe-travel-planner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered travel planner using Algolia NeuralSearch and Agent Studio",
+  "scripts": {
+    "dev": "pnpm --filter @vibe-travel/frontend dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r --filter=!@vibe-travel/e2e test",
+    "test:unit": "pnpm -r --filter=!@vibe-travel/e2e test",
+    "test:e2e": "pnpm --filter @vibe-travel/e2e test",
+    "test:e2e:ui": "pnpm --filter @vibe-travel/e2e test:ui",
+    "test:all": "pnpm test:unit && pnpm test:e2e",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean",
+    "pipeline:generate": "pnpm --filter @vibe-travel/data-pipeline run cli generate",
+    "pipeline:upload": "pnpm --filter @vibe-travel/data-pipeline run cli upload"
+  },
+  "keywords": [
+    "travel",
+    "algolia",
+    "neuralsearch",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@8.14.0"
+}

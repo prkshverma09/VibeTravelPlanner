@@ -1,0 +1,47 @@
+.card {
+  @apply bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer;
+}
+
+.card:focus {
+  @apply outline-none ring-2 ring-purple-500 ring-offset-2;
+}
+
+.imageContainer {
+  @apply relative h-48 w-full;
+}
+
+.content {
+  @apply p-4;
+}
+
+.header {
+  @apply flex items-baseline justify-between mb-2;
+}
+
+.cityName {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.country {
+  @apply text-sm text-gray-500;
+}
+
+.tags {
+  @apply flex flex-wrap gap-1.5 mb-3;
+}
+
+.tag {
+  @apply px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full;
+}
+
+.description {
+  @apply text-sm text-gray-600 mb-4 line-clamp-3;
+}
+
+.scores {
+  @apply flex gap-4 text-sm;
+}
+
+.score {
+  @apply flex items-center gap-1;
+}

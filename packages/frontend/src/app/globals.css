@@ -1,0 +1,325 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 255, 255, 255;
+    --background-end-rgb: 250, 250, 250;
+    --primary: 147 51 234;
+    --primary-foreground: 255 255 255;
+    --accent: 236 72 153;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground-rgb: 255, 255, 255;
+      --background-start-rgb: 15, 15, 15;
+      --background-end-rgb: 0, 0, 0;
+    }
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background-start-rgb));
+    @apply antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-2.5 bg-purple-600 text-white rounded-lg font-medium 
+           hover:bg-purple-700 focus:outline-none focus:ring-2 
+           focus:ring-purple-500 focus:ring-offset-2 transition-colors;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium 
+           hover:bg-gray-200 focus:outline-none focus:ring-2 
+           focus:ring-gray-500 focus:ring-offset-2 transition-colors;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-md overflow-hidden;
+  }
+
+  .card-interactive {
+    @apply bg-white rounded-xl shadow-md overflow-hidden cursor-pointer
+           hover:shadow-lg transition-shadow duration-300
+           focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg
+           focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
+           placeholder:text-gray-400;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-purple-100 text-purple-700;
+  }
+
+  .badge-secondary {
+    @apply bg-gray-100 text-gray-700;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-700;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-700;
+  }
+
+  .badge-error {
+    @apply bg-red-100 text-red-700;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent;
+  }
+
+  .gradient-bg {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600;
+  }
+
+  .container-narrow {
+    @apply max-w-2xl mx-auto px-4;
+  }
+
+  .container-wide {
+    @apply max-w-6xl mx-auto px-4;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Algolia Chat Widget Styling */
+.ais-Chat {
+  @apply w-full min-h-[400px] flex flex-col;
+}
+
+.ais-Chat-container {
+  @apply flex flex-col h-full;
+}
+
+/* Fix for oversized SVG icons in Algolia Chat */
+.ais-Chat svg {
+  @apply w-5 h-5 max-w-5 max-h-5;
+}
+
+.ais-Chat img {
+  max-width: 100%;
+  height: auto;
+}
+
+.ais-Chat button svg {
+  @apply w-4 h-4;
+}
+
+/* Chat Header */
+.ais-Chat-header {
+  @apply flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50 gap-2;
+}
+
+.ais-Chat-header-actions {
+  @apply flex items-center gap-1;
+}
+
+.ais-Chat-header-title {
+  @apply flex items-center gap-2 text-sm font-semibold text-gray-700;
+}
+
+.ais-Chat-header-titleIcon {
+  @apply text-purple-500;
+}
+
+.ais-Chat-header-titleIcon svg,
+.ais-Chat-header-titleIcon img {
+  @apply w-5 h-5;
+}
+
+/* Hide non-functional Algolia header buttons (they only work in popup mode) */
+.ais-ChatHeader-actions,
+.ais-ChatHeader-clear,
+.ais-ChatHeader-close,
+.ais-ChatHeader-maximize {
+  @apply hidden;
+}
+
+/* Chat Messages Container */
+.ais-Chat-messages {
+  @apply flex-1 overflow-hidden relative;
+}
+
+.ais-Chat-messages-content {
+  @apply p-4;
+}
+
+.ais-Chat-messages-scroll {
+  @apply max-h-[400px] overflow-y-auto;
+}
+
+.ais-Chat-messages-scrollToBottom {
+  @apply absolute bottom-4 right-4 p-2 bg-white shadow-lg rounded-full text-gray-500 hover:text-gray-700 transition-colors cursor-pointer;
+}
+
+/* Individual Chat Messages - using actual Algolia class names */
+.ais-ChatMessage {
+  @apply mb-4 flex items-start gap-3;
+}
+
+/* User Message Styling */
+.ais-ChatMessage[data-role="user"] {
+  @apply flex-row-reverse;
+}
+
+.ais-ChatMessage[data-role="user"] .ais-ChatMessage-message {
+  @apply bg-purple-600 text-white rounded-2xl rounded-tr-md px-4 py-3 max-w-[80%];
+}
+
+.ais-ChatMessage[data-role="user"] .ais-ChatMessage-message span {
+  @apply text-white;
+}
+
+/* Assistant Message Styling */
+.ais-ChatMessage[data-role="assistant"] {
+  @apply flex-row;
+}
+
+.ais-ChatMessage[data-role="assistant"] .ais-ChatMessage-message {
+  @apply bg-gray-100 text-gray-800 rounded-2xl rounded-tl-md px-4 py-3 max-w-[85%];
+}
+
+.ais-ChatMessage[data-role="assistant"] .ais-ChatMessage-message > span > div {
+  @apply text-gray-800 leading-relaxed;
+}
+
+.ais-ChatMessage[data-role="assistant"] .ais-ChatMessage-message p {
+  @apply mb-2 last:mb-0;
+}
+
+/* Message Leading (Avatar) */
+.ais-ChatMessage-leading {
+  @apply flex-shrink-0;
+}
+
+/* Message Actions - copy/regenerate buttons */
+.ais-ChatMessage-actions {
+  @apply opacity-0 transition-opacity mt-2 flex gap-1;
+}
+
+.ais-ChatMessage:hover .ais-ChatMessage-actions {
+  @apply opacity-100;
+}
+
+.ais-ChatMessage-actions button {
+  @apply p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded transition-colors cursor-pointer;
+}
+
+/* Carousel/Tool Results in Messages */
+.ais-ChatMessage-tool {
+  @apply mt-3;
+}
+
+/* Search Results in Messages */
+.ais-Chat-items {
+  @apply mt-3;
+}
+
+.ais-Chat-items-header {
+  @apply flex items-center justify-between text-sm text-gray-500 mb-2 px-1;
+}
+
+.ais-Chat-items-header button {
+  @apply text-purple-600 hover:text-purple-700 font-medium text-sm flex items-center gap-1 cursor-pointer;
+}
+
+.ais-Chat-items-list {
+  @apply space-y-2;
+}
+
+/* Chat Prompt Area */
+.ais-Chat-prompt {
+  @apply border-t border-gray-100 p-4 bg-white;
+}
+
+.ais-Chat-prompt-body {
+  @apply flex items-end gap-2;
+}
+
+.ais-Chat-prompt-textarea {
+  @apply flex-1 px-4 py-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder-gray-400 min-h-[48px] max-h-[120px];
+}
+
+.ais-Chat-prompt-submit {
+  @apply p-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer;
+}
+
+.ais-Chat-prompt-footer,
+.ais-ChatPrompt-footer,
+.ais-ChatPrompt-disclaimer {
+  @apply hidden;
+}
+
+/* Toggle Button */
+.ais-Chat-toggleButton {
+  @apply fixed bottom-6 right-6 p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-lg hover:shadow-xl transition-shadow cursor-pointer z-50;
+}

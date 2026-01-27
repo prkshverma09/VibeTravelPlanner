@@ -1,0 +1,20 @@
+{
+  "name": "@vibe-travel/e2e",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.8.2",
+    "@playwright/test": "^1.40.1",
+    "@types/node": "^20.10.4",
+    "algoliasearch": "^4.22.1",
+    "dotenv": "^16.3.1",
+    "typescript": "^5.3.3"
+  }
+}
