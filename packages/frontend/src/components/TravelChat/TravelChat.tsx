@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useState, useEffect, Suspense, lazy, Component, ReactNode } from 'react';
-import { getAgentId, fetchCityById, fetchCitiesByIds } from '@/lib/algolia';
+import { useCallback, useState, useEffect, useRef, Suspense, lazy, Component, ReactNode } from 'react';
+import { getAgentId, fetchCityById, fetchCitiesByIds, searchWithEnhancement } from '@/lib/algolia';
 import { CityCard } from '@/components/CityCard';
 import { ActivePreferences } from '@/components/ActivePreferences';
 import { ComparisonTable } from '@/components/ComparisonTable';
@@ -11,6 +11,7 @@ import { BudgetEstimator } from '@/components/BudgetEstimator';
 import { useTripContext } from '@/context/TripContext';
 import { weatherService } from '@/services/weather.service';
 import { budgetService, TravelStyle } from '@/services/budget.service';
+import { queryEnhancementService } from '@/services/query-enhancement.service';
 import type { AlgoliaCity } from '@vibe-travel/shared';
 import styles from './TravelChat.module.css';
 
@@ -75,6 +76,11 @@ const HeaderIcon = () => (
 export function TravelChat({ onCityClick }: TravelChatProps) {
   const [agentId, setAgentId] = useState<string | null>(null);
   const [hasValidAgentId, setHasValidAgentId] = useState(false);
+  const [fallbackResults, setFallbackResults] = useState<AlgoliaCity[]>([]);
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [lastQuery, setLastQuery] = useState<string>('');
+  const [showFallback, setShowFallback] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const { state, dispatch } = useTripContext();
 
   useEffect(() => {
@@ -88,6 +94,70 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     }
   }, []);
 
+  useEffect(() => {
+    if (!chatContainerRef.current) return;
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === 'childList') {
+          const messages = chatContainerRef.current?.querySelectorAll('[class*="message"]');
+          if (messages && messages.length > 0) {
+            const lastMessage = messages[messages.length - 1];
+            const text = lastMessage.textContent?.toLowerCase() || '';
+            
+            const noResultsPatterns = [
+              "didn't find any",
+              "no perfect matches",
+              "couldn't find",
+              "no results",
+              "no destinations found",
+              "unable to find",
+              "no matches found",
+            ];
+            
+            const hasNoResults = noResultsPatterns.some(pattern => text.includes(pattern));
+            
+            if (hasNoResults && lastQuery && !showFallback) {
+              performEnhancedSearch(lastQuery);
+            }
+          }
+        }
+      }
+    });
+
+    observer.observe(chatContainerRef.current, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => observer.disconnect();
+  }, [lastQuery, showFallback]);
+
+  const performEnhancedSearch = useCallback(async (query: string) => {
+    if (isEnhancing) return;
+    
+    setIsEnhancing(true);
+    try {
+      const enhancement = await queryEnhancementService.enhanceQuery(query, true);
+      
+      const searchResult = await searchWithEnhancement({
+        query: enhancement.originalQuery,
+        expandedTerms: enhancement.expandedTerms,
+        filters: enhancement.suggestedFilters,
+        hitsPerPage: 6,
+      });
+      
+      if (searchResult.hits.length > 0) {
+        setFallbackResults(searchResult.hits);
+        setShowFallback(true);
+      }
+    } catch (error) {
+      console.error('Enhanced search failed:', error);
+    } finally {
+      setIsEnhancing(false);
+    }
+  }, [isEnhancing]);
+
   const handleCityClick = useCallback((city: AlgoliaCity) => {
     if (onCityClick) {
       onCityClick(city);
@@ -95,6 +165,10 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   }, [onCityClick]);
 
   const handleSuggestionClick = useCallback((query: string) => {
+    setLastQuery(query);
+    setShowFallback(false);
+    setFallbackResults([]);
+    
     const textarea = document.querySelector('.ais-ChatPrompt-textarea') as HTMLTextAreaElement;
     if (textarea) {
       textarea.focus();
@@ -114,6 +188,17 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         }
       }, 100);
     }
+  }, []);
+
+  const handleManualEnhancedSearch = useCallback(() => {
+    if (lastQuery) {
+      performEnhancedSearch(lastQuery);
+    }
+  }, [lastQuery, performEnhancedSearch]);
+
+  const handleDismissFallback = useCallback(() => {
+    setShowFallback(false);
+    setFallbackResults([]);
   }, []);
 
   const fetchCities = useCallback(async (ids: string[]): Promise<AlgoliaCity[]> => {
@@ -652,9 +737,62 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         className={styles.chatWidget} 
         data-testid="chat-widget"
         data-agent-id={agentId || undefined}
+        ref={chatContainerRef}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            const textarea = e.target as HTMLTextAreaElement;
+            if (textarea.tagName === 'TEXTAREA' && textarea.value.trim()) {
+              setLastQuery(textarea.value.trim());
+              setShowFallback(false);
+              setFallbackResults([]);
+            }
+          }
+        }}
       >
         {renderChatContent()}
       </div>
+
+      {showFallback && fallbackResults.length > 0 && (
+        <div className={styles.fallbackResults} data-testid="fallback-results">
+          <div className={styles.fallbackHeader}>
+            <span className={styles.fallbackTitle}>
+              Enhanced Search Results
+            </span>
+            <button
+              onClick={handleDismissFallback}
+              className={styles.fallbackDismiss}
+              aria-label="Dismiss enhanced results"
+              type="button"
+            >
+              ×
+            </button>
+          </div>
+          <p className={styles.fallbackDescription}>
+            Based on your query, here are some destinations that might match what you&apos;re looking for:
+          </p>
+          <div className={styles.fallbackGrid}>
+            {fallbackResults.slice(0, 4).map((city) => (
+              <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {lastQuery && !showFallback && !isEnhancing && (
+        <button
+          onClick={handleManualEnhancedSearch}
+          className={styles.enhancedSearchButton}
+          type="button"
+        >
+          Try Enhanced Search
+        </button>
+      )}
+
+      {isEnhancing && (
+        <div className={styles.enhancingIndicator}>
+          Enhancing search...
+        </div>
+      )}
 
       <div className={styles.suggestedQueries}>
         <p className={styles.suggestedTitle}>Try asking:</p>

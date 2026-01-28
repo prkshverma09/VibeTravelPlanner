@@ -6,4 +6,7 @@ export {
   getIndexSettings,
   fetchCityById,
   fetchCitiesByIds,
+  searchWithEnhancement,
 } from './client';
+
+export type { EnhancedSearchOptions, EnhancedSearchResult } from './client';

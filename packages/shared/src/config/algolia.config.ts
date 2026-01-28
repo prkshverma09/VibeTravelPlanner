@@ -140,6 +140,81 @@ export const SYNONYMS = [
     objectID: 'family-synonyms',
     type: 'synonym' as const,
     synonyms: ['family-friendly', 'kids', 'children', 'family vacation', 'family trip']
+  },
+  {
+    objectID: 'scenic-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['scenic', 'views', 'panoramic', 'landscape', 'picturesque', 'breathtaking', 'viewpoint', 'lookout']
+  },
+  {
+    objectID: 'cafe-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['cafe', 'cafes', 'coffee', 'cozy', 'charming', 'quaint', 'bistro', 'coffeehouse']
+  },
+  {
+    objectID: 'nature-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['nature', 'natural', 'wilderness', 'forests', 'mountains', 'parks', 'greenery', 'outdoors']
+  },
+  {
+    objectID: 'foodie-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['foodie', 'culinary', 'gastronomy', 'cuisine', 'dining', 'restaurants', 'food scene', 'gourmet']
+  },
+  {
+    objectID: 'artistic-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['artistic', 'artsy', 'creative', 'bohemian', 'galleries', 'street art', 'design']
+  },
+  {
+    objectID: 'modern-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['modern', 'contemporary', 'futuristic', 'cosmopolitan', 'urban', 'metropolitan', 'sleek']
+  },
+  {
+    objectID: 'budget-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['budget', 'cheap', 'affordable', 'inexpensive', 'economical', 'backpacker', 'low-cost']
+  },
+  {
+    objectID: 'luxury-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['luxury', 'luxurious', 'upscale', 'premium', 'high-end', 'exclusive', 'posh', 'fancy']
+  },
+  {
+    objectID: 'european-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['european', 'europe', 'old world', 'cobblestone', 'charming streets', 'classic']
+  },
+  {
+    objectID: 'asian-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['asian', 'asia', 'oriental', 'eastern', 'far east']
+  },
+  {
+    objectID: 'warm-weather-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['warm', 'sunny', 'hot', 'tropical', 'summer', 'sunshine', 'balmy']
+  },
+  {
+    objectID: 'winter-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['winter', 'snow', 'cold', 'ski', 'christmas', 'cozy winter', 'alpine']
+  },
+  {
+    objectID: 'photogenic-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['photogenic', 'instagram', 'instagrammable', 'photo-worthy', 'beautiful', 'stunning', 'gorgeous']
+  },
+  {
+    objectID: 'hidden-gem-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['hidden gem', 'off the beaten path', 'underrated', 'lesser known', 'undiscovered', 'secret']
+  },
+  {
+    objectID: 'walkable-synonyms',
+    type: 'synonym' as const,
+    synonyms: ['walkable', 'pedestrian', 'strolling', 'walking', 'on foot', 'compact']
   }
 ] as const;
 

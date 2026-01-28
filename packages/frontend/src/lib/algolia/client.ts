@@ -104,4 +104,68 @@ export async function fetchCitiesByIds(ids: string[]): Promise<AlgoliaCity[]> {
   }
 }
 
+export interface EnhancedSearchOptions {
+  query: string;
+  expandedTerms?: string[];
+  filters?: Record<string, string>;
+  hitsPerPage?: number;
+}
+
+export interface EnhancedSearchResult {
+  hits: AlgoliaCity[];
+  nbHits: number;
+  query: string;
+  processingTimeMS: number;
+}
+
+export async function searchWithEnhancement(
+  options: EnhancedSearchOptions
+): Promise<EnhancedSearchResult> {
+  const client = getSearchClient();
+  const indexName = getIndexName();
+  const { query, expandedTerms = [], filters = {}, hitsPerPage = 10 } = options;
+
+  const enhancedQuery = expandedTerms.length > 0
+    ? `${query} ${expandedTerms.join(' ')}`
+    : query;
+
+  const numericFilters: string[] = [];
+  for (const [attr, condition] of Object.entries(filters)) {
+    if (condition.startsWith('>')) {
+      const value = condition.slice(1);
+      numericFilters.push(`${attr} > ${value}`);
+    } else if (condition.startsWith('<')) {
+      const value = condition.slice(1);
+      numericFilters.push(`${attr} < ${value}`);
+    }
+  }
+
+  try {
+    const { results } = await client.search<AlgoliaCity>({
+      requests: [
+        {
+          indexName,
+          query: enhancedQuery,
+          hitsPerPage,
+          ...(numericFilters.length > 0 && { numericFilters }),
+        },
+      ],
+    });
+
+    const searchResults = results[0];
+    if ('hits' in searchResults) {
+      return {
+        hits: searchResults.hits,
+        nbHits: searchResults.nbHits || 0,
+        query: enhancedQuery,
+        processingTimeMS: searchResults.processingTimeMS || 0,
+      };
+    }
+    return { hits: [], nbHits: 0, query: enhancedQuery, processingTimeMS: 0 };
+  } catch (error) {
+    console.error('Enhanced search error:', error);
+    return { hits: [], nbHits: 0, query: enhancedQuery, processingTimeMS: 0 };
+  }
+}
+
 export { getIndexSettings };
