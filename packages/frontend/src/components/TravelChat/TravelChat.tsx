@@ -744,49 +744,52 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         }}
       >
         {renderChatContent()}
-      </div>
-
-      {showFallback && fallbackResults.length > 0 && (
-        <div className={styles.fallbackResults} data-testid="fallback-results">
-          <div className={styles.fallbackHeader}>
-            <span className={styles.fallbackTitle}>
-              Enhanced Search Results
-            </span>
+        
+        {lastQuery && !showFallback && !isEnhancing && (
+          <div className={styles.inChatAction}>
             <button
-              onClick={handleDismissFallback}
-              className={styles.fallbackDismiss}
-              aria-label="Dismiss enhanced results"
+              onClick={handleManualEnhancedSearch}
+              className={styles.inChatEnhancedButton}
               type="button"
             >
-              ×
+              ✨ Try Enhanced Search
             </button>
           </div>
-          <p className={styles.fallbackDescription}>
-            Based on your query, here are some destinations that might match what you&apos;re looking for:
-          </p>
-          <div className={styles.fallbackGrid}>
-            {fallbackResults.slice(0, 4).map((city) => (
-              <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
-            ))}
+        )}
+
+        {isEnhancing && (
+          <div className={styles.inChatAction}>
+            <div className={styles.inChatLoading}>
+              <span className={styles.loadingSpinner}></span>
+              Searching with enhanced query...
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {lastQuery && !showFallback && !isEnhancing && (
-        <button
-          onClick={handleManualEnhancedSearch}
-          className={styles.enhancedSearchButton}
-          type="button"
-        >
-          Try Enhanced Search
-        </button>
-      )}
-
-      {isEnhancing && (
-        <div className={styles.enhancingIndicator}>
-          Enhancing search...
-        </div>
-      )}
+        {showFallback && fallbackResults.length > 0 && (
+          <div className={styles.inChatResults} data-testid="fallback-results">
+            <div className={styles.inChatResultsHeader}>
+              <span>✨ Enhanced Search Results</span>
+              <button
+                onClick={handleDismissFallback}
+                className={styles.inChatDismiss}
+                aria-label="Dismiss enhanced results"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+            <p className={styles.inChatResultsDescription}>
+              Based on your query, here are some destinations that might match:
+            </p>
+            <div className={styles.inChatResultsGrid}>
+              {fallbackResults.slice(0, 4).map((city) => (
+                <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className={styles.suggestedQueries}>
         <p className={styles.suggestedTitle}>Try asking:</p>

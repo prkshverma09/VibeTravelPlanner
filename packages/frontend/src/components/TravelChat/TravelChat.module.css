@@ -215,3 +215,53 @@
 .enhancingIndicator {
   @apply w-full py-2 px-4 text-sm text-purple-500 bg-purple-50 border border-purple-100 rounded-lg mt-2 text-center animate-pulse;
 }
+
+/* In-Chat Action Container */
+.inChatAction {
+  @apply px-4 py-3 border-t border-gray-100;
+}
+
+/* In-Chat Enhanced Search Button */
+.inChatEnhancedButton {
+  @apply w-full py-3 px-4 text-sm font-medium text-purple-700 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2;
+}
+
+.inChatEnhancedButton:hover {
+  @apply border-purple-300 shadow-sm;
+}
+
+/* In-Chat Loading */
+.inChatLoading {
+  @apply flex items-center justify-center gap-2 text-sm text-purple-600 py-2;
+}
+
+.loadingSpinner {
+  @apply w-4 h-4 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin;
+}
+
+/* In-Chat Results */
+.inChatResults {
+  @apply mx-3 mb-3 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100;
+}
+
+.inChatResultsHeader {
+  @apply flex items-center justify-between mb-2 text-sm font-semibold text-purple-700;
+}
+
+.inChatDismiss {
+  @apply w-6 h-6 flex items-center justify-center text-purple-400 hover:text-purple-600 hover:bg-purple-100 rounded-full transition-colors cursor-pointer border-0 bg-transparent text-lg leading-none;
+}
+
+.inChatResultsDescription {
+  @apply text-xs text-purple-600 mb-3;
+}
+
+.inChatResultsGrid {
+  @apply grid grid-cols-1 gap-3;
+}
+
+@media (min-width: 640px) {
+  .inChatResultsGrid {
+    @apply grid-cols-2;
+  }
+}
