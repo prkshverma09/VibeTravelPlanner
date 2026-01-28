@@ -131,11 +131,38 @@ export async function searchWithEnhancement(
     'relaxing', 'luxury', 'artistic', 'nightlife', 'foodie', 'diverse'
   ];
   
+  const continentMappings: Record<string, string> = {
+    'european': 'Europe',
+    'europe': 'Europe',
+    'asian': 'Asia',
+    'asia': 'Asia',
+    'african': 'Africa',
+    'africa': 'Africa',
+    'american': 'North America',
+    'north american': 'North America',
+    'south american': 'South America',
+    'latin american': 'South America',
+    'oceania': 'Oceania',
+    'australian': 'Oceania',
+    'middle east': 'Middle East',
+    'middle eastern': 'Middle East',
+  };
+
+  const queryLower = query.toLowerCase();
+  let continentFilter: string | null = null;
+  
+  for (const [term, continent] of Object.entries(continentMappings)) {
+    if (queryLower.includes(term)) {
+      continentFilter = continent;
+      break;
+    }
+  }
+  
   const matchingTags = expandedTerms.filter(term => 
     knownVibeTags.some(tag => tag.includes(term.toLowerCase()) || term.toLowerCase().includes(tag))
   ).slice(0, 3);
   
-  const queryWords = query.toLowerCase().split(/[\s,]+/).filter(w => w.length > 2);
+  const queryWords = queryLower.split(/[\s,]+/).filter(w => w.length > 2);
   const matchingQueryTags = queryWords.filter(word =>
     knownVibeTags.some(tag => tag.includes(word) || word.includes(tag))
   );
@@ -146,8 +173,6 @@ export async function searchWithEnhancement(
     ? [allMatchingTags.join(' '), query]
     : [query];
 
-  console.log('[Enhanced Search] Trying queries:', searchQueries);
-
   for (const searchQuery of searchQueries) {
     try {
       const { results } = await client.search<AlgoliaCity>({
@@ -156,13 +181,13 @@ export async function searchWithEnhancement(
             indexName,
             query: searchQuery,
             hitsPerPage,
+            ...(continentFilter && { filters: `continent:"${continentFilter}"` }),
           },
         ],
       });
 
       const searchResults = results[0];
       if ('hits' in searchResults && searchResults.hits.length > 0) {
-        console.log('[Enhanced Search] Found', searchResults.hits.length, 'results for:', searchQuery);
         return {
           hits: searchResults.hits,
           nbHits: searchResults.nbHits || 0,
@@ -175,8 +200,34 @@ export async function searchWithEnhancement(
     }
   }
   
+  if (continentFilter) {
+    try {
+      const { results } = await client.search<AlgoliaCity>({
+        requests: [
+          {
+            indexName,
+            query: '',
+            hitsPerPage,
+            filters: `continent:"${continentFilter}"`,
+          },
+        ],
+      });
+
+      const searchResults = results[0];
+      if ('hits' in searchResults && searchResults.hits.length > 0) {
+        return {
+          hits: searchResults.hits,
+          nbHits: searchResults.nbHits || 0,
+          query: `All ${continentFilter} destinations`,
+          processingTimeMS: searchResults.processingTimeMS || 0,
+        };
+      }
+    } catch (error) {
+      console.error('Continent fallback search failed:', error);
+    }
+  }
+  
   try {
-    console.log('[Enhanced Search] Trying empty query for all results');
     const { results } = await client.search<AlgoliaCity>({
       requests: [
         {
