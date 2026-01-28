@@ -83,6 +83,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   const [showFallback, setShowFallback] = useState(false);
   const [messagesContainer, setMessagesContainer] = useState<Element | null>(null);
   const [visibleResultsCount, setVisibleResultsCount] = useState(2);
+  const [chatSessionKey, setChatSessionKey] = useState(() => Date.now().toString());
   const enhancedContentRef = useRef<HTMLDivElement>(null);
   const { state, dispatch } = useTripContext();
 
@@ -676,6 +677,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
       <ChatErrorBoundary fallback={PlaceholderContent}>
         <Suspense fallback={LoadingContent}>
           <AlgoliaChat
+            key={chatSessionKey}
             agentId={agentId}
             itemComponent={CityCardItem}
             classNames={chatClassNames}
@@ -709,34 +711,28 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     setMessagesContainer(null);
     
     try {
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      if (window.indexedDB) {
-        if (window.indexedDB.databases) {
-          const databases = await window.indexedDB.databases();
-          for (const db of databases) {
-            if (db.name) {
-              window.indexedDB.deleteDatabase(db.name);
-            }
-          }
-        } else {
-          const knownDbs = ['algolia', 'algolia-insights', 'keyval-store', 'firebaseLocalStorageDb'];
-          for (const dbName of knownDbs) {
-            window.indexedDB.deleteDatabase(dbName);
-          }
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && (key.includes('instantsearch') || key.includes('algolia') || key.includes('chat'))) {
+          keysToRemove.push(key);
         }
       }
+      keysToRemove.forEach(key => sessionStorage.removeItem(key));
       
-      if ('caches' in window) {
-        const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      const localKeysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.includes('instantsearch') || key.includes('algolia') || key.includes('chat'))) {
+          localKeysToRemove.push(key);
+        }
       }
+      localKeysToRemove.forEach(key => localStorage.removeItem(key));
     } catch (e) {
-      console.warn('Failed to clear some storage:', e);
+      console.warn('Failed to clear storage:', e);
     }
     
-    window.location.reload();
+    setChatSessionKey(Date.now().toString());
   }, [dispatch]);
 
   return (
