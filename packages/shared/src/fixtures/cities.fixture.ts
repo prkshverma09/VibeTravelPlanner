@@ -15,7 +15,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 9,
     climate_type: 'Humid subtropical',
     best_time_to_visit: 'Spring (March-May) or Fall (September-November)',
-    image_url: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800'
+    image_url: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
+    _geoloc: { lat: 35.6762, lng: 139.6503 },
+    primary_vibe: 'cultural'
   },
   {
     objectID: 'paris-france',
@@ -31,7 +33,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 8,
     climate_type: 'Oceanic',
     best_time_to_visit: 'Spring (April-June) or Fall (September-November)',
-    image_url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800'
+    image_url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
+    _geoloc: { lat: 48.8566, lng: 2.3522 },
+    primary_vibe: 'romantic'
   },
   {
     objectID: 'cape-town-south-africa',
@@ -47,7 +51,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 7,
     climate_type: 'Mediterranean',
     best_time_to_visit: 'November to March',
-    image_url: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800'
+    image_url: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800',
+    _geoloc: { lat: -33.9249, lng: 18.4241 },
+    primary_vibe: 'adventure'
   },
   {
     objectID: 'new-york-united-states',
@@ -63,7 +69,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 10,
     climate_type: 'Humid subtropical',
     best_time_to_visit: 'April to June or September to November',
-    image_url: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800'
+    image_url: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800',
+    _geoloc: { lat: 40.7128, lng: -74.0060 },
+    primary_vibe: 'nightlife'
   },
   {
     objectID: 'bali-indonesia',
@@ -79,7 +87,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 7,
     climate_type: 'Tropical',
     best_time_to_visit: 'April to October',
-    image_url: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800'
+    image_url: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800',
+    _geoloc: { lat: -8.3405, lng: 115.0920 },
+    primary_vibe: 'beach'
   },
   {
     objectID: 'buenos-aires-argentina',
@@ -95,7 +105,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 10,
     climate_type: 'Humid subtropical',
     best_time_to_visit: 'March to May or September to November',
-    image_url: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800'
+    image_url: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800',
+    _geoloc: { lat: -34.6037, lng: -58.3816 },
+    primary_vibe: 'nightlife'
   },
   {
     objectID: 'sydney-australia',
@@ -111,7 +123,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 8,
     climate_type: 'Humid subtropical',
     best_time_to_visit: 'September to November or March to May',
-    image_url: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800'
+    image_url: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800',
+    _geoloc: { lat: -33.8688, lng: 151.2093 },
+    primary_vibe: 'beach'
   },
   {
     objectID: 'marrakech-morocco',
@@ -127,7 +141,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 5,
     climate_type: 'Semi-arid',
     best_time_to_visit: 'March to May or September to November',
-    image_url: 'https://images.unsplash.com/photo-1597212720153-fa53c7dae73b?w=800'
+    image_url: 'https://images.unsplash.com/photo-1597212720153-fa53c7dae73b?w=800',
+    _geoloc: { lat: 31.6295, lng: -7.9811 },
+    primary_vibe: 'cultural'
   },
   {
     objectID: 'reykjavik-iceland',
@@ -143,7 +159,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 6,
     climate_type: 'Subpolar oceanic',
     best_time_to_visit: 'June to August or September to March for Northern Lights',
-    image_url: 'https://images.unsplash.com/photo-1504233529578-6d46baba6d34?w=800'
+    image_url: 'https://images.unsplash.com/photo-1504233529578-6d46baba6d34?w=800',
+    _geoloc: { lat: 64.1466, lng: -21.9426 },
+    primary_vibe: 'nature'
   },
   {
     objectID: 'barcelona-spain',
@@ -159,7 +177,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 9,
     climate_type: 'Mediterranean',
     best_time_to_visit: 'May to June or September to October',
-    image_url: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800'
+    image_url: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800',
+    _geoloc: { lat: 41.3851, lng: 2.1734 },
+    primary_vibe: 'cultural'
   },
   {
     objectID: 'kyoto-japan',
@@ -175,7 +195,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 4,
     climate_type: 'Humid subtropical',
     best_time_to_visit: 'March to May or October to November',
-    image_url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800'
+    image_url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800',
+    _geoloc: { lat: 35.0116, lng: 135.7681 },
+    primary_vibe: 'cultural'
   },
   {
     objectID: 'rio-de-janeiro-brazil',
@@ -191,7 +213,9 @@ export const mockCities: AlgoliaCity[] = [
     nightlife_score: 10,
     climate_type: 'Tropical',
     best_time_to_visit: 'December to March for summer, June to September for mild weather',
-    image_url: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800'
+    image_url: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800',
+    _geoloc: { lat: -22.9068, lng: -43.1729 },
+    primary_vibe: 'beach'
   }
 ];
 

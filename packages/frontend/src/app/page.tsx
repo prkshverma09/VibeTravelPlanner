@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { InstantSearchProvider } from '@/providers';
 import { TravelChat } from '@/components/TravelChat';
 import { CityCard } from '@/components/CityCard';
+import { DestinationMap } from '@/components/DestinationMap';
 import { mockCities } from '@vibe-travel/shared';
 import type { AlgoliaCity } from '@vibe-travel/shared';
 
@@ -11,14 +13,19 @@ const featuredCities = mockCities.slice(0, 3);
 
 export default function HomePage() {
   const router = useRouter();
+  const [selectedCity, setSelectedCity] = useState<AlgoliaCity | null>(null);
 
   const handleCityClick = (city: AlgoliaCity) => {
     router.push(`/city/${city.objectID}`);
   };
 
+  const handleCitySelect = (city: AlgoliaCity) => {
+    setSelectedCity(city);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Vibe-Check Travel Planner
@@ -31,7 +38,19 @@ export default function HomePage() {
 
         <section className="mb-16" data-testid="travel-chat-placeholder">
           <InstantSearchProvider>
-            <TravelChat onCityClick={handleCityClick} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div data-testid="chat-panel">
+                <TravelChat onCityClick={handleCityClick} />
+              </div>
+              <div className="h-[600px] lg:h-auto min-h-[500px]">
+                <DestinationMap
+                  destinations={mockCities}
+                  selectedCity={selectedCity}
+                  onCitySelect={handleCitySelect}
+                  onCityClick={handleCityClick}
+                />
+              </div>
+            </div>
           </InstantSearchProvider>
         </section>
 

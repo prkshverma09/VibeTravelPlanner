@@ -1,12 +1,31 @@
+import type { BudgetTier, CostBreakdown } from './budget';
+import type { Month, SeasonalEvent } from './seasonal';
+
 export type Continent =
   | 'Africa'
   | 'Asia'
   | 'Europe'
   | 'North America'
   | 'South America'
-  | 'Oceania';
+  | 'Oceania'
+  | 'Middle East';
 
 export type ScoreValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+
+export type EnglishProficiency = 'high' | 'medium' | 'low';
+
+export type VibeCategory =
+  | 'adventure'
+  | 'romantic'
+  | 'cultural'
+  | 'beach'
+  | 'nightlife'
+  | 'nature';
+
+export interface GeoLocation {
+  lat: number;
+  lng: number;
+}
 
 export interface City {
   city: string;
@@ -23,9 +42,42 @@ export interface City {
   climate_type: string;
   best_time_to_visit: string;
   image_url: string;
+  _geoloc?: GeoLocation;
+  primary_vibe?: VibeCategory;
 }
 
 export interface AlgoliaCity extends City {
+  objectID: string;
+}
+
+export interface EnhancedCity extends City {
+  budget_tier: BudgetTier;
+  avg_daily_cost_usd: number;
+  cost_breakdown: CostBreakdown;
+
+  safety_rating: number;
+  visa_free_for: string[];
+  primary_language: string;
+  english_proficiency: EnglishProficiency;
+  currency: string;
+  currency_symbol: string;
+
+  local_cuisine: string[];
+  cuisine_highlights: string[];
+  vegetarian_friendly: boolean;
+
+  best_months: Month[];
+  avoid_months: Month[];
+  seasonal_events: SeasonalEvent[];
+
+  timezone: string;
+  flight_hub: boolean;
+
+  similar_cities: string[];
+  pairs_well_with: string[];
+}
+
+export interface EnhancedAlgoliaCity extends EnhancedCity {
   objectID: string;
 }
 

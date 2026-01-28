@@ -11,6 +11,20 @@ const ContinentSchema = z.enum([
 
 const ScoreSchema = z.number().int().min(1).max(10);
 
+const VibeCategorySchema = z.enum([
+  'adventure',
+  'romantic',
+  'cultural',
+  'beach',
+  'nightlife',
+  'nature'
+]);
+
+const GeoLocationSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180)
+});
+
 export const CitySchema = z.object({
   city: z.string().min(1),
   country: z.string().min(1),
@@ -24,12 +38,16 @@ export const CitySchema = z.object({
   nightlife_score: ScoreSchema,
   climate_type: z.string().min(1),
   best_time_to_visit: z.string().min(1),
-  image_url: z.string().url()
+  image_url: z.string().url(),
+  _geoloc: GeoLocationSchema.optional(),
+  primary_vibe: VibeCategorySchema.optional()
 });
 
 export const AlgoliaCitySchema = CitySchema.extend({
   objectID: z.string().min(1)
 });
+
+export { GeoLocationSchema, VibeCategorySchema };
 
 export const BaseCityDataSchema = CitySchema.pick({
   city: true,

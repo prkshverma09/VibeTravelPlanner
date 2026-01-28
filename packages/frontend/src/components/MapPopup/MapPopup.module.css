@@ -1,0 +1,117 @@
+.popup :global(.mapboxgl-popup-content) {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.popup :global(.mapboxgl-popup-close-button) {
+  font-size: 20px;
+  color: white;
+  right: 8px;
+  top: 8px;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.popup :global(.mapboxgl-popup-close-button:hover) {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.card {
+  width: 280px;
+}
+
+.imageContainer {
+  position: relative;
+  height: 140px;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.content {
+  padding: 12px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #333;
+}
+
+.tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.description {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.scores {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.viewButton {
+  flex: 1;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-size: 14px;
+}
+
+.viewButton:hover {
+  opacity: 0.9;
+}
+
+.itineraryButton {
+  padding: 8px 12px;
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.itineraryButton:hover {
+  background: #e0e0e0;
+}
+
+.itineraryButton.inItinerary {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.itineraryButton.inItinerary:hover {
+  background: #ffcdd2;
+}

@@ -1,0 +1,71 @@
+.marker {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(0);
+  transition: transform 0.2s ease;
+}
+
+.marker:hover {
+  transform: translateY(-4px);
+}
+
+.pin {
+  width: 24px;
+  height: 24px;
+  background: var(--marker-color);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.pinInner {
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  transform: rotate(45deg);
+}
+
+.orderNumber {
+  transform: rotate(45deg);
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.selected .pin {
+  width: 32px;
+  height: 32px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.selected .pinInner {
+  width: 14px;
+  height: 14px;
+}
+
+.inItinerary .pin {
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.label {
+  margin-top: 4px;
+  background: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: #333;
+}
