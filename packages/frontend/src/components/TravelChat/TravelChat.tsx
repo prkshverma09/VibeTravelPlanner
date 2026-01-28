@@ -82,6 +82,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   const [lastQuery, setLastQuery] = useState<string>('');
   const [showFallback, setShowFallback] = useState(false);
   const [messagesContainer, setMessagesContainer] = useState<Element | null>(null);
+  const [visibleResultsCount, setVisibleResultsCount] = useState(2);
   const enhancedContentRef = useRef<HTMLDivElement>(null);
   const { state, dispatch } = useTripContext();
 
@@ -144,6 +145,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     if (isEnhancing || !query.trim()) return;
     
     setIsEnhancing(true);
+    setVisibleResultsCount(2);
     try {
       const enhancement = await queryEnhancementService.enhanceQuery(query, true);
       
@@ -220,6 +222,11 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   const handleDismissFallback = useCallback(() => {
     setShowFallback(false);
     setFallbackResults([]);
+    setVisibleResultsCount(2);
+  }, []);
+
+  const handleShowMoreResults = useCallback(() => {
+    setVisibleResultsCount(prev => prev + 2);
   }, []);
 
   const fetchCities = useCallback(async (ids: string[]): Promise<AlgoliaCity[]> => {
@@ -801,32 +808,49 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
               </div>
             )}
 
-            {showFallback && fallbackResults.length > 0 && (
-              <div className={styles.inChatMessage} data-testid="fallback-results">
-                <div className={styles.messageAvatar}>✨</div>
-                <div className={styles.inChatResults}>
-                  <div className={styles.inChatResultsHeader}>
-                    <span>Enhanced Search Results</span>
-                    <button
-                      onClick={handleDismissFallback}
-                      className={styles.inChatDismiss}
-                      aria-label="Dismiss enhanced results"
-                      type="button"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  <p className={styles.inChatResultsDescription}>
-                    Based on your query, here are some destinations that might match:
-                  </p>
-                  <div className={styles.inChatResultsGrid}>
-                    {fallbackResults.slice(0, 4).map((city) => (
-                      <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
-                    ))}
+            {showFallback && fallbackResults.length > 0 && (() => {
+              const uniqueResults = fallbackResults.filter(
+                (city, index, self) => self.findIndex(c => c.objectID === city.objectID) === index
+              );
+              const visibleResults = uniqueResults.slice(0, visibleResultsCount);
+              const hasMoreResults = uniqueResults.length > visibleResultsCount;
+              
+              return (
+                <div className={styles.inChatMessage} data-testid="fallback-results">
+                  <div className={styles.messageAvatar}>✨</div>
+                  <div className={styles.inChatResults}>
+                    <div className={styles.inChatResultsHeader}>
+                      <span>Enhanced Search Results</span>
+                      <button
+                        onClick={handleDismissFallback}
+                        className={styles.inChatDismiss}
+                        aria-label="Dismiss enhanced results"
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p className={styles.inChatResultsDescription}>
+                      Based on your query, here are some destinations that might match:
+                    </p>
+                    <div className={styles.inChatResultsGrid}>
+                      {visibleResults.map((city) => (
+                        <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
+                      ))}
+                    </div>
+                    {hasMoreResults && (
+                      <button
+                        onClick={handleShowMoreResults}
+                        className={styles.showMoreButton}
+                        type="button"
+                      >
+                        Show more results
+                      </button>
+                    )}
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>,
           messagesContainer
         )}

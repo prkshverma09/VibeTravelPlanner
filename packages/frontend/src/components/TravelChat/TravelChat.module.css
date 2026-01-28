@@ -283,3 +283,25 @@
     @apply grid-cols-2;
   }
 }
+
+/* Show More Button */
+.showMoreButton {
+  @apply w-full mt-3 py-2 px-4 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all cursor-pointer;
+}
+
+.showMoreButton:hover {
+  @apply border-purple-300;
+}
+
+/* Hide results count and pagination from Algolia Chat */
+.chatWidget :global([class*="results"]),
+.chatWidget :global([class*="Results"]),
+.inChatResults :global([class*="results"]),
+.inChatResults :global([class*="Results"]) {
+  display: none !important;
+}
+
+/* Ensure our grid is visible */
+.inChatResultsGrid {
+  display: grid !important;
+}
