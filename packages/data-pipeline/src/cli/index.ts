@@ -4,7 +4,19 @@ import { config } from 'dotenv';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { PipelineOrchestrator, PipelineProgress } from '../pipeline/orchestrator';
-import { AlgoliaClient, DEFAULT_INDEX_SETTINGS } from '../clients/algolia.client';
+import {
+  AlgoliaClient,
+  DEFAULT_INDEX_SETTINGS,
+  ENHANCED_INDEX_SETTINGS,
+  EXPERIENCES_INDEX_SETTINGS,
+  EXPERIENCES_INDEX_NAME
+} from '../clients/algolia.client';
+import {
+  enhancedMockCities,
+  mockExperiences,
+  EnhancedAlgoliaCitySchema,
+  AlgoliaExperienceSchema
+} from '@vibe-travel/shared';
 
 config();
 
@@ -205,6 +217,180 @@ program
       await client.configureIndex(DEFAULT_INDEX_SETTINGS);
 
       log(`✅ Successfully configured index: ${options.index}`);
+    } catch (error) {
+      log(`❌ Error: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('upload-enhanced')
+  .description('Upload enhanced city data to Algolia (20+ cities with budget/seasonal data)')
+  .option('-i, --index <name>', 'Algolia index name', 'travel_destinations')
+  .option('--dry-run', 'Validate data without uploading')
+  .action(async (options) => {
+    const envValidation = validateEnv(process.env);
+    if (!envValidation.valid && !options.dryRun) {
+      console.error('Missing required environment variables:', envValidation.missing.join(', '));
+      process.exit(1);
+    }
+
+    log(`\n🌟 Vibe Travel Pipeline - Upload Enhanced Cities\n`);
+    log(`Index: ${options.index}`);
+    log(`Cities to upload: ${enhancedMockCities.length}`);
+    log(`Dry run: ${options.dryRun ? 'Yes' : 'No'}`);
+    log('');
+
+    enhancedMockCities.forEach(city => {
+      const result = EnhancedAlgoliaCitySchema.safeParse(city);
+      if (!result.success) {
+        console.error(`Invalid city ${city.city}:`, result.error.issues);
+        process.exit(1);
+      }
+    });
+    log(`✅ All ${enhancedMockCities.length} cities passed validation`);
+
+    if (options.dryRun) {
+      log('\nSample data:');
+      log(JSON.stringify(enhancedMockCities[0], null, 2));
+      return;
+    }
+
+    try {
+      const client = new AlgoliaClient({
+        appId: process.env.ALGOLIA_APP_ID!,
+        apiKey: process.env.ALGOLIA_ADMIN_KEY || process.env.ALGOLIA_API_KEY!,
+        indexName: options.index,
+      });
+
+      await client.configureIndex(ENHANCED_INDEX_SETTINGS);
+      log('✅ Index configured with enhanced settings');
+
+      const result = await client.uploadRecords(enhancedMockCities as unknown as Record<string, unknown>[], {
+        waitForTask: true,
+        onProgress: ({ uploaded, total }) => {
+          const progress = Math.round((uploaded / total) * 100);
+          updateProgress(`${getSpinner()} Uploading: ${uploaded}/${total} (${progress}%)`);
+        },
+      });
+
+      log('');
+
+      if (result.success) {
+        log(`✅ Successfully uploaded ${enhancedMockCities.length} enhanced cities to ${options.index}`);
+      } else {
+        log(`❌ Upload failed: ${result.error}`);
+        process.exit(1);
+      }
+    } catch (error) {
+      log(`❌ Error: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('upload-experiences')
+  .description('Upload experience data to the experiences index')
+  .option('-i, --index <name>', 'Algolia index name', EXPERIENCES_INDEX_NAME)
+  .option('--dry-run', 'Validate data without uploading')
+  .action(async (options) => {
+    const envValidation = validateEnv(process.env);
+    if (!envValidation.valid && !options.dryRun) {
+      console.error('Missing required environment variables:', envValidation.missing.join(', '));
+      process.exit(1);
+    }
+
+    log(`\n🎯 Vibe Travel Pipeline - Upload Experiences\n`);
+    log(`Index: ${options.index}`);
+    log(`Experiences to upload: ${mockExperiences.length}`);
+    log(`Dry run: ${options.dryRun ? 'Yes' : 'No'}`);
+    log('');
+
+    mockExperiences.forEach(exp => {
+      const result = AlgoliaExperienceSchema.safeParse(exp);
+      if (!result.success) {
+        console.error(`Invalid experience ${exp.name}:`, result.error.issues);
+        process.exit(1);
+      }
+    });
+    log(`✅ All ${mockExperiences.length} experiences passed validation`);
+
+    if (options.dryRun) {
+      log('\nSample data:');
+      log(JSON.stringify(mockExperiences[0], null, 2));
+      return;
+    }
+
+    try {
+      const client = new AlgoliaClient({
+        appId: process.env.ALGOLIA_APP_ID!,
+        apiKey: process.env.ALGOLIA_ADMIN_KEY || process.env.ALGOLIA_API_KEY!,
+        indexName: options.index,
+      });
+
+      await client.configureIndex(EXPERIENCES_INDEX_SETTINGS);
+      log('✅ Index configured with experiences settings');
+
+      const result = await client.uploadRecords(mockExperiences as unknown as Record<string, unknown>[], {
+        waitForTask: true,
+        onProgress: ({ uploaded, total }) => {
+          const progress = Math.round((uploaded / total) * 100);
+          updateProgress(`${getSpinner()} Uploading: ${uploaded}/${total} (${progress}%)`);
+        },
+      });
+
+      log('');
+
+      if (result.success) {
+        log(`✅ Successfully uploaded ${mockExperiences.length} experiences to ${options.index}`);
+      } else {
+        log(`❌ Upload failed: ${result.error}`);
+        process.exit(1);
+      }
+    } catch (error) {
+      log(`❌ Error: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('configure-enhanced')
+  .description('Configure Algolia index with enhanced settings (budget/seasonal facets)')
+  .option('-i, --index <name>', 'Index name', 'travel_destinations')
+  .option('--experiences', 'Configure experiences index instead')
+  .option('--dry-run', 'Show settings without applying')
+  .action(async (options) => {
+    const envValidation = validateEnv(process.env);
+    if (!envValidation.valid && !options.dryRun) {
+      console.error('Missing required environment variables:', envValidation.missing.join(', '));
+      process.exit(1);
+    }
+
+    const settings = options.experiences ? EXPERIENCES_INDEX_SETTINGS : ENHANCED_INDEX_SETTINGS;
+    const indexName = options.experiences ? EXPERIENCES_INDEX_NAME : options.index;
+
+    log(`\n⚙️  Vibe Travel Pipeline - Configure Enhanced\n`);
+    log(`Index: ${indexName}`);
+    log(`Type: ${options.experiences ? 'Experiences' : 'Enhanced Cities'}`);
+    log(`Dry run: ${options.dryRun ? 'Yes' : 'No'}`);
+    log('');
+
+    if (options.dryRun) {
+      log('Settings to apply:');
+      log(JSON.stringify(settings, null, 2));
+      return;
+    }
+
+    try {
+      const client = new AlgoliaClient({
+        appId: process.env.ALGOLIA_APP_ID!,
+        apiKey: process.env.ALGOLIA_ADMIN_KEY || process.env.ALGOLIA_API_KEY!,
+        indexName,
+      });
+
+      await client.configureIndex(settings);
+
+      log(`✅ Successfully configured index: ${indexName}`);
     } catch (error) {
       log(`❌ Error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);

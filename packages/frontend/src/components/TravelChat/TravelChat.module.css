@@ -139,3 +139,32 @@
 .toolLoading {
   @apply bg-gray-50 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm animate-pulse my-2;
 }
+
+/* Hide default Algolia Chat item list UI (results count, view all) that appears with tool outputs */
+.chatWidget :global(.ais-Chat-itemList-header),
+.chatWidget :global(.ais-Chat-itemList-footer),
+.chatWidget :global(.ais-ChatMessage-itemList-header),
+.chatWidget :global(.ais-ChatMessage-itemList-footer),
+.chatWidget :global(.ais-ChatMessage-itemsHeader),
+.chatWidget :global(.ais-ChatMessage-itemsFooter),
+.chatWidget :global(.ais-ChatMessage-items-header),
+.chatWidget :global(.ais-ChatMessage-items-footer),
+.chatWidget :global([class*="itemList-header"]),
+.chatWidget :global([class*="itemList-footer"]),
+.chatWidget :global([class*="itemsHeader"]),
+.chatWidget :global([class*="itemsFooter"]),
+.chatWidget :global([class*="viewAll"]),
+.chatWidget :global([class*="ViewAll"]),
+.chatWidget :global([class*="results-count"]),
+.chatWidget :global([class*="resultsCount"]),
+.chatWidget :global([class*="ItemsHeader"]),
+.chatWidget :global([class*="ItemsFooter"]) {
+  display: none !important;
+}
+
+/* Also hide the "X of Y results" and "View all" text patterns */
+.chatWidget :global(.ais-ChatMessage) > div:has(> a[href*="view"]),
+.chatWidget :global([class*="Message"]) :global([class*="pagination"]),
+.chatWidget :global([class*="Message"]) :global([class*="Pagination"]) {
+  display: none !important;
+}

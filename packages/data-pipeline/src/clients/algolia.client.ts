@@ -1,7 +1,10 @@
 import algoliasearch, { SearchClient, SearchIndex } from 'algoliasearch';
 import {
   INDEX_NAME as SHARED_INDEX_NAME,
+  EXPERIENCES_INDEX_NAME,
   getIndexSettings as getSharedIndexSettings,
+  getEnhancedIndexSettings,
+  getExperiencesIndexSettings,
   getSynonyms,
   AlgoliaSynonym,
 } from '@vibe-travel/shared';
@@ -55,7 +58,33 @@ export const DEFAULT_INDEX_SETTINGS: IndexSettings = {
   hitsPerPage: 20,
 };
 
-export { SHARED_INDEX_NAME };
+const enhancedSettings = getEnhancedIndexSettings();
+export const ENHANCED_INDEX_SETTINGS: IndexSettings = {
+  searchableAttributes: [...enhancedSettings.searchableAttributes],
+  attributesForFaceting: [...enhancedSettings.attributesForFaceting],
+  customRanking: [...enhancedSettings.customRanking],
+  ranking: [...enhancedSettings.ranking],
+  attributesToHighlight: ['city', 'country', 'description', 'vibe_tags', 'local_cuisine'],
+  attributesToSnippet: ['description:50'],
+  highlightPreTag: '<mark>',
+  highlightPostTag: '</mark>',
+  hitsPerPage: 20,
+};
+
+const experiencesSettings = getExperiencesIndexSettings();
+export const EXPERIENCES_INDEX_SETTINGS: IndexSettings = {
+  searchableAttributes: [...experiencesSettings.searchableAttributes],
+  attributesForFaceting: [...experiencesSettings.attributesForFaceting],
+  customRanking: [...experiencesSettings.customRanking],
+  ranking: [...experiencesSettings.ranking],
+  attributesToHighlight: ['name', 'description', 'vibe_tags', 'highlights'],
+  attributesToSnippet: ['description:50'],
+  highlightPreTag: '<mark>',
+  highlightPostTag: '</mark>',
+  hitsPerPage: 20,
+};
+
+export { SHARED_INDEX_NAME, EXPERIENCES_INDEX_NAME };
 
 export class AlgoliaClient {
   private client: SearchClient;

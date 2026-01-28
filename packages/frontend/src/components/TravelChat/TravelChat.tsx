@@ -170,30 +170,31 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
               });
               addToolResult({
                 output: {
-                  cities,
+                  comparisonData: cities,
                   comparison: {
                     attributes: input.focus_attributes || [],
                     recommendation: cities.length === 2 ? `Compare ${cities[0].city} and ${cities[1].city}` : null,
+                    cityNames: cities.map(c => c.city),
                   },
                 },
               });
             } else {
-              addToolResult({ output: { cities: [], comparison: { recommendation: 'Not enough cities found' } } });
+              addToolResult({ output: { comparisonData: [], comparison: { recommendation: 'Not enough cities found' } } });
             }
           } catch {
-            addToolResult({ output: { cities: [], comparison: { recommendation: 'Error fetching cities' } } });
+            addToolResult({ output: { comparisonData: [], comparison: { recommendation: 'Error fetching cities' } } });
           }
         } else {
-          addToolResult({ output: { cities: [], comparison: { recommendation: 'No cities specified' } } });
+          addToolResult({ output: { comparisonData: [], comparison: { recommendation: 'No cities specified' } } });
         }
       },
       layoutComponent: ({ message }: any) => {
-        if (!message.output?.cities?.length) {
+        if (!message.output?.comparisonData?.length) {
           return <div className={styles.toolLoading}>Loading comparison...</div>;
         }
         return (
           <ComparisonTable
-            cities={message.output.cities}
+            cities={message.output.comparisonData}
             recommendation={message.output.comparison?.recommendation}
             onSelect={(city: AlgoliaCity) => {
               dispatch({
