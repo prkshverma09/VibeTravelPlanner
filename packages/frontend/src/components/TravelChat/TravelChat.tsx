@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect, useRef, Suspense, lazy, Component, ReactNode } from 'react';
+import { useCallback, useState, useEffect, Suspense, lazy, Component, ReactNode } from 'react';
 import { getAgentId, fetchCityById, fetchCitiesByIds, searchWithEnhancement } from '@/lib/algolia';
 import { CityCard } from '@/components/CityCard';
 import { ActivePreferences } from '@/components/ActivePreferences';
@@ -80,7 +80,6 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
   const [showFallback, setShowFallback] = useState(false);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
   const { state, dispatch } = useTripContext();
 
   useEffect(() => {
@@ -94,47 +93,8 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     }
   }, []);
 
-  useEffect(() => {
-    if (!chatContainerRef.current) return;
-
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.type === 'childList') {
-          const messages = chatContainerRef.current?.querySelectorAll('[class*="message"]');
-          if (messages && messages.length > 0) {
-            const lastMessage = messages[messages.length - 1];
-            const text = lastMessage.textContent?.toLowerCase() || '';
-            
-            const noResultsPatterns = [
-              "didn't find any",
-              "no perfect matches",
-              "couldn't find",
-              "no results",
-              "no destinations found",
-              "unable to find",
-              "no matches found",
-            ];
-            
-            const hasNoResults = noResultsPatterns.some(pattern => text.includes(pattern));
-            
-            if (hasNoResults && lastQuery && !showFallback) {
-              performEnhancedSearch(lastQuery);
-            }
-          }
-        }
-      }
-    });
-
-    observer.observe(chatContainerRef.current, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => observer.disconnect();
-  }, [lastQuery, showFallback]);
-
   const performEnhancedSearch = useCallback(async (query: string) => {
-    if (isEnhancing) return;
+    if (isEnhancing || !query.trim()) return;
     
     setIsEnhancing(true);
     try {
@@ -737,7 +697,6 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         className={styles.chatWidget} 
         data-testid="chat-widget"
         data-agent-id={agentId || undefined}
-        ref={chatContainerRef}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             const textarea = e.target as HTMLTextAreaElement;
