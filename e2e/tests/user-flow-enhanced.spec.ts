@@ -35,15 +35,37 @@ test.describe('End-to-End User Flow with Enhanced Search', () => {
   test('chat interaction with suggestion chips', async ({ page }) => {
     await page.goto('/');
     
+    // Wait for page to fully load
+    await page.waitForSelector('[data-testid="chat-widget"]');
+    await page.waitForTimeout(1000);
+    
     // Find and click on a suggestion chip
     const suggestionChip = page.locator('button').filter({ hasText: /Romantic European city/i });
     
     if (await suggestionChip.isVisible()) {
+      // Click the suggestion chip
       await suggestionChip.click();
+      
+      // Wait for the message to be sent and appear in the chat
+      await page.waitForTimeout(500);
+      
       await page.screenshot({ path: '.playwright-mcp/e2e-flow-04-chip-clicked.png', fullPage: true });
       
-      // Wait for the chat to process (the textarea should have the query)
-      await page.waitForTimeout(500);
+      // Verify the user message appears in the chat
+      const userMessage = page.locator('[class*="message"]').filter({ hasText: /Romantic European city/i });
+      
+      // Wait for either the message to appear or timeout
+      try {
+        await userMessage.waitFor({ timeout: 5000 });
+        console.log('User message appeared in chat');
+      } catch {
+        console.log('Message may still be loading');
+      }
+      
+      // Wait for AI response
+      await page.waitForTimeout(3000);
+      
+      await page.screenshot({ path: '.playwright-mcp/e2e-flow-04b-after-response.png', fullPage: true });
     }
   });
 

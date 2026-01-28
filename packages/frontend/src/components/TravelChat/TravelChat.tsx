@@ -124,31 +124,45 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     }
   }, [onCityClick]);
 
+  const setReactInputValue = useCallback((input: HTMLTextAreaElement, value: string) => {
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      'value'
+    )?.set;
+    
+    if (nativeInputValueSetter) {
+      nativeInputValueSetter.call(input, value);
+    }
+    
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }, []);
+
   const handleSuggestionClick = useCallback((query: string) => {
     setLastQuery(query);
     setShowFallback(false);
     setFallbackResults([]);
     
-    const textarea = document.querySelector('.ais-ChatPrompt-textarea') as HTMLTextAreaElement;
-    if (textarea) {
-      textarea.focus();
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype,
-        'value'
-      )?.set;
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(textarea, query);
-      }
-      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    const chatWidget = document.querySelector('[data-testid="chat-widget"]');
+    if (!chatWidget) return;
+
+    const textarea = chatWidget.querySelector('textarea') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    textarea.focus();
+    setReactInputValue(textarea, query);
+    
+    setTimeout(() => {
+      setReactInputValue(textarea, query);
       
       setTimeout(() => {
-        const submitButton = document.querySelector('.ais-ChatPrompt-submit') as HTMLButtonElement;
-        if (submitButton && !submitButton.disabled) {
+        const submitButton = chatWidget.querySelector('button[type="submit"]') as HTMLButtonElement;
+        if (submitButton) {
+          submitButton.removeAttribute('disabled');
           submitButton.click();
         }
-      }, 100);
-    }
-  }, []);
+      }, 50);
+    }, 50);
+  }, [setReactInputValue]);
 
   const handleManualEnhancedSearch = useCallback(() => {
     if (lastQuery) {
