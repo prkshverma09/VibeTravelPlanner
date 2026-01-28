@@ -4,3 +4,5 @@ export { createCompareCitiesHandler } from './compareCities';
 export { createAddToTripPlanHandler } from './addToTripPlan';
 export { createGenerateItineraryHandler } from './generateItinerary';
 export { createClearPreferencesHandler } from './clearPreferences';
+export { createCheckWeatherHandler } from './checkWeather';
+export type { CheckWeatherInput, CheckWeatherOutput } from './checkWeather';

@@ -140,6 +140,10 @@
   @apply bg-gray-50 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm animate-pulse my-2;
 }
 
+.toolError {
+  @apply bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm font-medium my-2;
+}
+
 /* Hide default Algolia Chat item list UI (results count, view all) that appears with tool outputs */
 .chatWidget :global(.ais-Chat-itemList-header),
 .chatWidget :global(.ais-Chat-itemList-footer),

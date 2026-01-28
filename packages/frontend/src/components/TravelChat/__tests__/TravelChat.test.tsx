@@ -91,7 +91,7 @@ describe('TravelChat', () => {
       const chat = screen.queryByTestId('algolia-chat');
       if (chat) {
         expect(chat).toHaveAttribute('data-has-tools', 'true');
-        expect(chat).toHaveAttribute('data-tools-count', '5');
+        expect(chat).toHaveAttribute('data-tools-count', '8');
       }
     });
   });

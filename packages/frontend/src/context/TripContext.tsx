@@ -34,11 +34,18 @@ export interface ComparisonState {
   isActive: boolean;
 }
 
+export interface WishlistItem {
+  city: AlgoliaCity;
+  notes: string | null;
+  addedAt: number;
+}
+
 export interface TripState {
   preferences: TravelPreference[];
   tripPlan: TripDestination[];
   comparison: ComparisonState;
   conversationSummary: string[];
+  wishlist: WishlistItem[];
 }
 
 type TripAction =
@@ -51,6 +58,9 @@ type TripAction =
   | { type: 'SET_COMPARISON'; payload: ComparisonState }
   | { type: 'CLEAR_COMPARISON' }
   | { type: 'ADD_CONVERSATION_SUMMARY'; payload: string }
+  | { type: 'ADD_TO_WISHLIST'; payload: Omit<WishlistItem, 'addedAt'> }
+  | { type: 'REMOVE_FROM_WISHLIST'; payload: { cityId: string } }
+  | { type: 'CLEAR_WISHLIST' }
   | { type: 'RESET_ALL' };
 
 const initialState: TripState = {
@@ -62,6 +72,7 @@ const initialState: TripState = {
     isActive: false,
   },
   conversationSummary: [],
+  wishlist: [],
 };
 
 function tripReducer(state: TripState, action: TripAction): TripState {
@@ -136,6 +147,30 @@ function tripReducer(state: TripState, action: TripAction): TripState {
         conversationSummary: [...state.conversationSummary, action.payload].slice(-10),
       };
 
+    case 'ADD_TO_WISHLIST': {
+      const existingIndex = state.wishlist.findIndex(
+        (w) => w.city.objectID === action.payload.city.objectID
+      );
+      if (existingIndex >= 0) {
+        const updated = [...state.wishlist];
+        updated[existingIndex] = { ...action.payload, addedAt: Date.now() };
+        return { ...state, wishlist: updated };
+      }
+      return {
+        ...state,
+        wishlist: [...state.wishlist, { ...action.payload, addedAt: Date.now() }],
+      };
+    }
+
+    case 'REMOVE_FROM_WISHLIST':
+      return {
+        ...state,
+        wishlist: state.wishlist.filter((w) => w.city.objectID !== action.payload.cityId),
+      };
+
+    case 'CLEAR_WISHLIST':
+      return { ...state, wishlist: [] };
+
     case 'RESET_ALL':
       return initialState;
 
@@ -151,6 +186,8 @@ interface TripContextValue {
   hasPreferences: boolean;
   hasTripPlan: boolean;
   totalTripDays: number;
+  hasWishlist: boolean;
+  wishlistCount: number;
 }
 
 const TripContext = createContext<TripContextValue | null>(null);
@@ -179,6 +216,8 @@ export function TripProvider({ children }: TripProviderProps) {
       hasPreferences: state.preferences.length > 0,
       hasTripPlan: state.tripPlan.length > 0,
       totalTripDays,
+      hasWishlist: state.wishlist.length > 0,
+      wishlistCount: state.wishlist.length,
     }),
     [state, activePreferencesText, totalTripDays]
   );

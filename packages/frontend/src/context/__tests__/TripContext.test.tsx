@@ -456,4 +456,131 @@ describe('TripContext', () => {
       }).toThrow('useTripContext must be used within TripProvider');
     });
   });
+
+  describe('wishlist', () => {
+    it('should add city to wishlist', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[0], notes: 'Want to visit!' },
+        });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(1);
+      expect(result.current.state.wishlist[0].city.objectID).toBe('tokyo-japan');
+      expect(result.current.state.wishlist[0].notes).toBe('Want to visit!');
+      expect(result.current.hasWishlist).toBe(true);
+      expect(result.current.wishlistCount).toBe(1);
+    });
+
+    it('should update existing wishlist item', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[0], notes: 'Original note' },
+        });
+      });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[0], notes: 'Updated note' },
+        });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(1);
+      expect(result.current.state.wishlist[0].notes).toBe('Updated note');
+    });
+
+    it('should remove city from wishlist', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[0], notes: null },
+        });
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[1], notes: null },
+        });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(2);
+
+      act(() => {
+        result.current.dispatch({
+          type: 'REMOVE_FROM_WISHLIST',
+          payload: { cityId: 'tokyo-japan' },
+        });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(1);
+      expect(result.current.state.wishlist[0].city.objectID).toBe('paris-france');
+    });
+
+    it('should clear wishlist', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[0], notes: null },
+        });
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[1], notes: null },
+        });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(2);
+
+      act(() => {
+        result.current.dispatch({ type: 'CLEAR_WISHLIST' });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(0);
+      expect(result.current.hasWishlist).toBe(false);
+      expect(result.current.wishlistCount).toBe(0);
+    });
+
+    it('should track addedAt timestamp', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+      const before = Date.now();
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[0], notes: null },
+        });
+      });
+
+      const after = Date.now();
+      expect(result.current.state.wishlist[0].addedAt).toBeGreaterThanOrEqual(before);
+      expect(result.current.state.wishlist[0].addedAt).toBeLessThanOrEqual(after);
+    });
+
+    it('should reset wishlist with RESET_ALL', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_WISHLIST',
+          payload: { city: mockCities[0], notes: null },
+        });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(1);
+
+      act(() => {
+        result.current.dispatch({ type: 'RESET_ALL' });
+      });
+
+      expect(result.current.state.wishlist).toHaveLength(0);
+    });
+  });
 });

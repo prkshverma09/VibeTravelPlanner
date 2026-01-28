@@ -5,7 +5,9 @@ import { createCompareCitiesHandler } from '../compareCities';
 import { createAddToTripPlanHandler } from '../addToTripPlan';
 import { createGenerateItineraryHandler } from '../generateItinerary';
 import { createClearPreferencesHandler } from '../clearPreferences';
+import { createCheckWeatherHandler } from '../checkWeather';
 import type { TripState } from '../../context/TripContext';
+import type { WeatherData } from '../../services/weather.service';
 
 const createInitialState = (): TripState => ({
   preferences: [],
@@ -460,6 +462,102 @@ describe('Client-Side Tools', () => {
           clearedCount: 3,
           message: expect.stringContaining('all'),
         }),
+      });
+    });
+  });
+
+  describe('checkWeather', () => {
+    const mockWeatherData: WeatherData = {
+      city: 'Tokyo',
+      country: 'Japan',
+      current: {
+        temperature: 22,
+        feelsLike: 21,
+        humidity: 65,
+        weatherCode: 1,
+        weatherDescription: 'Mainly clear',
+        weatherIcon: '🌤️',
+        windSpeed: 12,
+        isDay: true,
+      },
+      forecast: [
+        {
+          date: '2026-01-28',
+          dayName: 'Today',
+          tempMax: 24,
+          tempMin: 18,
+          weatherCode: 1,
+          weatherDescription: 'Mainly clear',
+          weatherIcon: '🌤️',
+          precipitationProbability: 10,
+        },
+      ],
+      packingRecommendations: ['Pack light clothing'],
+      activitySuggestions: ['Great for outdoor activities'],
+    };
+
+    it('should return weather data for valid city', async () => {
+      const getWeather = vi.fn().mockResolvedValue(mockWeatherData);
+      const addToolResult = vi.fn();
+
+      const handler = createCheckWeatherHandler(getWeather);
+      await handler.onToolCall({
+        input: { city_name: 'Tokyo', country: 'Japan' },
+        addToolResult,
+      });
+
+      expect(getWeather).toHaveBeenCalledWith('Tokyo', 'Japan');
+      expect(addToolResult).toHaveBeenCalledWith({
+        output: { weather: mockWeatherData },
+      });
+    });
+
+    it('should handle city without country', async () => {
+      const getWeather = vi.fn().mockResolvedValue(mockWeatherData);
+      const addToolResult = vi.fn();
+
+      const handler = createCheckWeatherHandler(getWeather);
+      await handler.onToolCall({
+        input: { city_name: 'Tokyo', country: null },
+        addToolResult,
+      });
+
+      expect(getWeather).toHaveBeenCalledWith('Tokyo', undefined);
+    });
+
+    it('should return error when city not found', async () => {
+      const getWeather = vi.fn().mockResolvedValue(null);
+      const addToolResult = vi.fn();
+
+      const handler = createCheckWeatherHandler(getWeather);
+      await handler.onToolCall({
+        input: { city_name: 'NonexistentCity', country: null },
+        addToolResult,
+      });
+
+      expect(addToolResult).toHaveBeenCalledWith({
+        output: {
+          weather: null,
+          error: expect.stringContaining('NonexistentCity'),
+        },
+      });
+    });
+
+    it('should handle API errors gracefully', async () => {
+      const getWeather = vi.fn().mockRejectedValue(new Error('API Error'));
+      const addToolResult = vi.fn();
+
+      const handler = createCheckWeatherHandler(getWeather);
+      await handler.onToolCall({
+        input: { city_name: 'Tokyo', country: 'Japan' },
+        addToolResult,
+      });
+
+      expect(addToolResult).toHaveBeenCalledWith({
+        output: {
+          weather: null,
+          error: expect.stringContaining('Failed to fetch'),
+        },
       });
     });
   });

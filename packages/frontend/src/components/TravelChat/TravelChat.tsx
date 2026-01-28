@@ -6,7 +6,11 @@ import { CityCard } from '@/components/CityCard';
 import { ActivePreferences } from '@/components/ActivePreferences';
 import { ComparisonTable } from '@/components/ComparisonTable';
 import { ItineraryView } from '@/components/ItineraryView';
+import { WeatherCard } from '@/components/WeatherCard';
+import { BudgetEstimator } from '@/components/BudgetEstimator';
 import { useTripContext } from '@/context/TripContext';
+import { weatherService } from '@/services/weather.service';
+import { budgetService, TravelStyle } from '@/services/budget.service';
 import type { AlgoliaCity } from '@vibe-travel/shared';
 import styles from './TravelChat.module.css';
 
@@ -315,6 +319,197 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
           ✓ {message.output?.message || 'Preferences cleared'}
         </div>
       ),
+    },
+    check_weather: {
+      onToolCall: async ({ addToolResult, ...rest }: any) => {
+        const input = rest.input as { city_name: string; country: string | null } | undefined;
+        if (input?.city_name) {
+          try {
+            const weather = await weatherService.getWeather(input.city_name, input.country || undefined);
+            if (weather) {
+              addToolResult({
+                output: { weather },
+              });
+            } else {
+              addToolResult({
+                output: {
+                  weather: null,
+                  error: `Could not find weather data for ${input.city_name}`,
+                },
+              });
+            }
+          } catch {
+            addToolResult({
+              output: {
+                weather: null,
+                error: 'Failed to fetch weather data. Please try again.',
+              },
+            });
+          }
+        } else {
+          addToolResult({
+            output: {
+              weather: null,
+              error: 'No city specified',
+            },
+          });
+        }
+      },
+      layoutComponent: ({ message }: any) => {
+        if (message.output?.error) {
+          return (
+            <div className={styles.toolError} data-testid="tool-weather-error">
+              ⚠️ {message.output.error}
+            </div>
+          );
+        }
+        if (!message.output?.weather) {
+          return <div className={styles.toolLoading}>Loading weather data...</div>;
+        }
+        return <WeatherCard weather={message.output.weather} />;
+      },
+    },
+    estimate_budget: {
+      onToolCall: async ({ addToolResult, ...rest }: any) => {
+        const input = rest.input as {
+          city_id: string;
+          duration_days: number;
+          travel_style: TravelStyle;
+          travelers: number;
+        } | undefined;
+        
+        if (input?.city_id) {
+          try {
+            const city = await fetchCity(input.city_id);
+            if (city) {
+              const estimate = budgetService.calculateEstimate({
+                city,
+                durationDays: input.duration_days || 5,
+                travelStyle: input.travel_style || 'mid-range',
+                travelers: input.travelers || 1,
+              });
+              addToolResult({
+                output: { estimate, city },
+              });
+            } else {
+              addToolResult({
+                output: {
+                  estimate: null,
+                  error: `Could not find city with ID ${input.city_id}`,
+                },
+              });
+            }
+          } catch {
+            addToolResult({
+              output: {
+                estimate: null,
+                error: 'Failed to calculate budget estimate. Please try again.',
+              },
+            });
+          }
+        } else {
+          addToolResult({
+            output: {
+              estimate: null,
+              error: 'No city specified for budget estimate',
+            },
+          });
+        }
+      },
+      layoutComponent: ({ message }: any) => {
+        if (message.output?.error) {
+          return (
+            <div className={styles.toolError} data-testid="tool-budget-error">
+              ⚠️ {message.output.error}
+            </div>
+          );
+        }
+        if (!message.output?.estimate) {
+          return <div className={styles.toolLoading}>Calculating budget estimate...</div>;
+        }
+        return (
+          <BudgetEstimator
+            estimate={message.output.estimate}
+            onAddToTrip={(estimate) => {
+              if (message.output?.city) {
+                dispatch({
+                  type: 'ADD_TO_TRIP',
+                  payload: {
+                    city: message.output.city,
+                    durationDays: estimate.durationDays,
+                    notes: `Budget: $${estimate.totalEstimate.mid} (${estimate.travelStyle})`,
+                  },
+                });
+              }
+            }}
+          />
+        );
+      },
+    },
+    add_to_wishlist: {
+      onToolCall: async ({ addToolResult, ...rest }: any) => {
+        const input = rest.input as { city_id: string; notes: string | null } | undefined;
+        
+        if (input?.city_id) {
+          try {
+            const city = await fetchCity(input.city_id);
+            if (city) {
+              dispatch({
+                type: 'ADD_TO_WISHLIST',
+                payload: {
+                  city,
+                  notes: input.notes,
+                },
+              });
+              addToolResult({
+                output: {
+                  success: true,
+                  message: `Added ${city.city} to your wishlist!`,
+                  city,
+                },
+              });
+            } else {
+              addToolResult({
+                output: {
+                  success: false,
+                  error: `Could not find city with ID ${input.city_id}`,
+                },
+              });
+            }
+          } catch {
+            addToolResult({
+              output: {
+                success: false,
+                error: 'Failed to add to wishlist. Please try again.',
+              },
+            });
+          }
+        } else {
+          addToolResult({
+            output: {
+              success: false,
+              error: 'No city specified',
+            },
+          });
+        }
+      },
+      layoutComponent: ({ message }: any) => {
+        if (message.output?.error) {
+          return (
+            <div className={styles.toolError} data-testid="tool-wishlist-error">
+              ⚠️ {message.output.error}
+            </div>
+          );
+        }
+        if (!message.output?.success) {
+          return <div className={styles.toolLoading}>Adding to wishlist...</div>;
+        }
+        return (
+          <div className={styles.toolConfirmation} data-testid="tool-wishlist-success">
+            💫 {message.output.message}
+          </div>
+        );
+      },
     },
   } as any;
 

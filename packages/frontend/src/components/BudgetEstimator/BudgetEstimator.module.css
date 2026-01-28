@@ -1,0 +1,217 @@
+.container {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 16px;
+  padding: 20px;
+  color: white;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  margin: 12px 0;
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.cityName {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.styleBadge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tripDetails {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.totalSection {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.mainTotal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.totalLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.totalAmount {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.rangeRow {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.rangeLabel {
+  opacity: 0.7;
+}
+
+.rangeValue {
+  font-weight: 500;
+}
+
+.perStats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 16px;
+}
+
+.perStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.perValue {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.perLabel {
+  font-size: 11px;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.perDivider {
+  width: 1px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.breakdownSection {
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.breakdownLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breakdownIcon {
+  font-size: 16px;
+}
+
+.breakdownName {
+  font-size: 13px;
+}
+
+.breakdownAmount {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tipsSection {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.tipsList {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.tipItem {
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.addButton {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  color: #059669;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.addButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
