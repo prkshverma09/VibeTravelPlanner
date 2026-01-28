@@ -701,39 +701,39 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   const handleClearConversation = useCallback(async () => {
     dispatch({ type: 'RESET_ALL' });
     
-    // Clear Algolia Chat storage (conversation history)
+    setFallbackResults([]);
+    setLastQuery('');
+    setShowFallback(false);
+    setIsEnhancing(false);
+    setVisibleResultsCount(2);
+    setMessagesContainer(null);
+    
     try {
-      // Clear localStorage
-      const localKeysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.includes('algolia') || key.includes('ais-') || key.includes('chat') || key.includes('agent'))) {
-          localKeysToRemove.push(key);
-        }
-      }
-      localKeysToRemove.forEach(key => localStorage.removeItem(key));
+      localStorage.clear();
+      sessionStorage.clear();
       
-      // Clear sessionStorage
-      const sessionKeysToRemove: string[] = [];
-      for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i);
-        if (key && (key.includes('algolia') || key.includes('ais-') || key.includes('chat') || key.includes('agent'))) {
-          sessionKeysToRemove.push(key);
-        }
-      }
-      sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
-      
-      // Clear IndexedDB databases used by Algolia
-      if (window.indexedDB && window.indexedDB.databases) {
-        const databases = await window.indexedDB.databases();
-        for (const db of databases) {
-          if (db.name && (db.name.includes('algolia') || db.name.includes('chat'))) {
-            window.indexedDB.deleteDatabase(db.name);
+      if (window.indexedDB) {
+        if (window.indexedDB.databases) {
+          const databases = await window.indexedDB.databases();
+          for (const db of databases) {
+            if (db.name) {
+              window.indexedDB.deleteDatabase(db.name);
+            }
+          }
+        } else {
+          const knownDbs = ['algolia', 'algolia-insights', 'keyval-store', 'firebaseLocalStorageDb'];
+          for (const dbName of knownDbs) {
+            window.indexedDB.deleteDatabase(dbName);
           }
         }
       }
+      
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
     } catch (e) {
-      // Storage access might fail in some contexts
+      console.warn('Failed to clear some storage:', e);
     }
     
     window.location.reload();
