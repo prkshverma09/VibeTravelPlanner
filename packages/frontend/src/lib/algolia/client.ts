@@ -123,31 +123,66 @@ export async function searchWithEnhancement(
 ): Promise<EnhancedSearchResult> {
   const client = getSearchClient();
   const indexName = getIndexName();
-  const { query, expandedTerms = [], filters = {}, hitsPerPage = 10 } = options;
+  const { query, expandedTerms = [], hitsPerPage = 10 } = options;
 
-  const enhancedQuery = expandedTerms.length > 0
-    ? `${query} ${expandedTerms.join(' ')}`
-    : query;
+  const knownVibeTags = [
+    'romantic', 'scenic', 'adventurous', 'cultural', 'historic',
+    'beach', 'coastal', 'tropical', 'nature', 'urban', 'bustling',
+    'relaxing', 'luxury', 'artistic', 'nightlife', 'foodie', 'diverse'
+  ];
+  
+  const matchingTags = expandedTerms.filter(term => 
+    knownVibeTags.some(tag => tag.includes(term.toLowerCase()) || term.toLowerCase().includes(tag))
+  ).slice(0, 3);
+  
+  const queryWords = query.toLowerCase().split(/[\s,]+/).filter(w => w.length > 2);
+  const matchingQueryTags = queryWords.filter(word =>
+    knownVibeTags.some(tag => tag.includes(word) || word.includes(tag))
+  );
+  
+  const allMatchingTags = [...new Set([...matchingQueryTags, ...matchingTags])].slice(0, 3);
+  
+  const searchQueries = allMatchingTags.length > 0
+    ? [allMatchingTags.join(' '), query]
+    : [query];
 
-  const numericFilters: string[] = [];
-  for (const [attr, condition] of Object.entries(filters)) {
-    if (condition.startsWith('>')) {
-      const value = condition.slice(1);
-      numericFilters.push(`${attr} > ${value}`);
-    } else if (condition.startsWith('<')) {
-      const value = condition.slice(1);
-      numericFilters.push(`${attr} < ${value}`);
+  console.log('[Enhanced Search] Trying queries:', searchQueries);
+
+  for (const searchQuery of searchQueries) {
+    try {
+      const { results } = await client.search<AlgoliaCity>({
+        requests: [
+          {
+            indexName,
+            query: searchQuery,
+            hitsPerPage,
+          },
+        ],
+      });
+
+      const searchResults = results[0];
+      if ('hits' in searchResults && searchResults.hits.length > 0) {
+        console.log('[Enhanced Search] Found', searchResults.hits.length, 'results for:', searchQuery);
+        return {
+          hits: searchResults.hits,
+          nbHits: searchResults.nbHits || 0,
+          query: searchQuery,
+          processingTimeMS: searchResults.processingTimeMS || 0,
+        };
+      }
+    } catch (error) {
+      console.error('Search attempt failed:', error);
     }
   }
-
+  
   try {
+    console.log('[Enhanced Search] Trying empty query for all results');
     const { results } = await client.search<AlgoliaCity>({
       requests: [
         {
           indexName,
-          query: enhancedQuery,
+          query: '',
           hitsPerPage,
-          ...(numericFilters.length > 0 && { numericFilters }),
         },
       ],
     });
@@ -157,15 +192,15 @@ export async function searchWithEnhancement(
       return {
         hits: searchResults.hits,
         nbHits: searchResults.nbHits || 0,
-        query: enhancedQuery,
+        query: '',
         processingTimeMS: searchResults.processingTimeMS || 0,
       };
     }
-    return { hits: [], nbHits: 0, query: enhancedQuery, processingTimeMS: 0 };
   } catch (error) {
-    console.error('Enhanced search error:', error);
-    return { hits: [], nbHits: 0, query: enhancedQuery, processingTimeMS: 0 };
+    console.error('Final fallback search failed:', error);
   }
+
+  return { hits: [], nbHits: 0, query, processingTimeMS: 0 };
 }
 
 export { getIndexSettings };

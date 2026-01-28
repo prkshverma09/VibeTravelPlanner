@@ -93,6 +93,27 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     }
   }, []);
 
+  useEffect(() => {
+    const chatWidget = document.querySelector('[data-testid="chat-widget"]');
+    if (!chatWidget) return;
+
+    const handleFormSubmit = (e: Event) => {
+      const form = e.target as HTMLFormElement;
+      const textarea = form.querySelector('textarea') as HTMLTextAreaElement;
+      if (textarea && textarea.value.trim()) {
+        setLastQuery(textarea.value.trim());
+        setShowFallback(false);
+        setFallbackResults([]);
+      }
+    };
+
+    const form = chatWidget.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', handleFormSubmit);
+      return () => form.removeEventListener('submit', handleFormSubmit);
+    }
+  }, [hasValidAgentId]);
+
   const performEnhancedSearch = useCallback(async (query: string) => {
     if (isEnhancing || !query.trim()) return;
     
