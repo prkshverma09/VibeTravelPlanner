@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useState, useEffect, Suspense, lazy, Component, ReactNode } from 'react';
+import { useCallback, useState, useEffect, useRef, Suspense, lazy, Component, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { getAgentId, fetchCityById, fetchCitiesByIds, searchWithEnhancement } from '@/lib/algolia';
 import { CityCard } from '@/components/CityCard';
 import { ActivePreferences } from '@/components/ActivePreferences';
@@ -80,6 +81,8 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
   const [showFallback, setShowFallback] = useState(false);
+  const [messagesContainer, setMessagesContainer] = useState<Element | null>(null);
+  const enhancedContentRef = useRef<HTMLDivElement>(null);
   const { state, dispatch } = useTripContext();
 
   useEffect(() => {
@@ -92,6 +95,29 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
       setHasValidAgentId(false);
     }
   }, []);
+
+  useEffect(() => {
+    const findMessagesContainer = () => {
+      const chatWidget = document.querySelector('[data-testid="chat-widget"]');
+      if (!chatWidget) return;
+      
+      const messagesEl = chatWidget.querySelector('[class*="algoliaChatMessages"]') 
+        || chatWidget.querySelector('[class*="ChatMessages"]')
+        || chatWidget.querySelector('[class*="messages"]');
+      
+      if (messagesEl) {
+        setMessagesContainer(messagesEl);
+      }
+    };
+
+    const timer = setTimeout(findMessagesContainer, 500);
+    const interval = setInterval(findMessagesContainer, 1000);
+    
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [hasValidAgentId]);
 
   useEffect(() => {
     const chatWidget = document.querySelector('[data-testid="chat-widget"]');
@@ -745,49 +771,64 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
       >
         {renderChatContent()}
         
-        {lastQuery && !showFallback && !isEnhancing && (
-          <div className={styles.inChatAction}>
-            <button
-              onClick={handleManualEnhancedSearch}
-              className={styles.inChatEnhancedButton}
-              type="button"
-            >
-              ✨ Try Enhanced Search
-            </button>
-          </div>
-        )}
+        {messagesContainer && createPortal(
+          <div ref={enhancedContentRef} className={styles.enhancedSearchPortal}>
+            {lastQuery && !showFallback && !isEnhancing && (
+              <div className={styles.inChatMessage}>
+                <div className={styles.messageAvatar}>✨</div>
+                <div className={styles.inChatAction}>
+                  <p className={styles.inChatPrompt}>
+                    Didn&apos;t find what you were looking for? Try an enhanced search.
+                  </p>
+                  <button
+                    onClick={handleManualEnhancedSearch}
+                    className={styles.inChatEnhancedButton}
+                    type="button"
+                  >
+                    Try Enhanced Search
+                  </button>
+                </div>
+              </div>
+            )}
 
-        {isEnhancing && (
-          <div className={styles.inChatAction}>
-            <div className={styles.inChatLoading}>
-              <span className={styles.loadingSpinner}></span>
-              Searching with enhanced query...
-            </div>
-          </div>
-        )}
+            {isEnhancing && (
+              <div className={styles.inChatMessage}>
+                <div className={styles.messageAvatar}>✨</div>
+                <div className={styles.inChatLoading}>
+                  <span className={styles.loadingSpinner}></span>
+                  Searching with enhanced query...
+                </div>
+              </div>
+            )}
 
-        {showFallback && fallbackResults.length > 0 && (
-          <div className={styles.inChatResults} data-testid="fallback-results">
-            <div className={styles.inChatResultsHeader}>
-              <span>✨ Enhanced Search Results</span>
-              <button
-                onClick={handleDismissFallback}
-                className={styles.inChatDismiss}
-                aria-label="Dismiss enhanced results"
-                type="button"
-              >
-                ×
-              </button>
-            </div>
-            <p className={styles.inChatResultsDescription}>
-              Based on your query, here are some destinations that might match:
-            </p>
-            <div className={styles.inChatResultsGrid}>
-              {fallbackResults.slice(0, 4).map((city) => (
-                <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
-              ))}
-            </div>
-          </div>
+            {showFallback && fallbackResults.length > 0 && (
+              <div className={styles.inChatMessage} data-testid="fallback-results">
+                <div className={styles.messageAvatar}>✨</div>
+                <div className={styles.inChatResults}>
+                  <div className={styles.inChatResultsHeader}>
+                    <span>Enhanced Search Results</span>
+                    <button
+                      onClick={handleDismissFallback}
+                      className={styles.inChatDismiss}
+                      aria-label="Dismiss enhanced results"
+                      type="button"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <p className={styles.inChatResultsDescription}>
+                    Based on your query, here are some destinations that might match:
+                  </p>
+                  <div className={styles.inChatResultsGrid}>
+                    {fallbackResults.slice(0, 4).map((city) => (
+                      <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>,
+          messagesContainer
         )}
       </div>
 
