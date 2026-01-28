@@ -69,25 +69,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Explore All {mockCities.length} Destinations
-          </h2>
-          <p className="text-gray-600 mb-6">
-            From bustling metropolises to serene beach towns, we&apos;ve curated 
-            destinations for every type of traveler.
-          </p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {['Asia', 'Europe', 'Africa', 'North America', 'South America', 'Oceania'].map((continent) => (
-              <span 
-                key={continent}
-                className="px-4 py-2 bg-white rounded-full shadow-sm text-gray-700 text-sm"
-              >
-                {continent}
-              </span>
-            ))}
-          </div>
-        </section>
       </div>
     </main>
   );
