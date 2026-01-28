@@ -35,7 +35,11 @@ export function MapPopup({
       onClose={onClose}
       className={styles.popup}
     >
-      <article className={styles.card} data-testid="map-popup">
+      <article 
+        className={styles.card} 
+        data-testid="map-popup"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={styles.imageContainer}>
           <Image
             src={city.image_url || '/placeholder-city.jpg'}
@@ -69,7 +73,10 @@ export function MapPopup({
           <div className={styles.actions}>
             <button
               className={styles.viewButton}
-              onClick={onViewDetails}
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails?.();
+              }}
               type="button"
               data-testid="popup-view-details"
             >
@@ -78,7 +85,10 @@ export function MapPopup({
             {onAddToItinerary && (
               <button
                 className={`${styles.itineraryButton} ${isInItinerary ? styles.inItinerary : ''}`}
-                onClick={onAddToItinerary}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddToItinerary();
+                }}
                 type="button"
                 data-testid="popup-add-itinerary"
               >
