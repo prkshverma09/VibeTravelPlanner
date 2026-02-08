@@ -2,10 +2,12 @@
 
 import Image from 'next/image';
 import type { AlgoliaCity } from '@vibe-travel/shared';
+import { WishlistButton } from '@/components/WishlistButton';
 
 interface CityCardProps {
   city: AlgoliaCity;
   onClick?: (city: AlgoliaCity) => void;
+  showWishlistButton?: boolean;
 }
 
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&q=80';
@@ -23,7 +25,7 @@ function truncateDescription(text: string, maxLength: number = 150): string {
   return truncated + '...';
 }
 
-export function CityCard({ city, onClick }: CityCardProps) {
+export function CityCard({ city, onClick, showWishlistButton = true }: CityCardProps) {
   const displayTags = city.vibe_tags.slice(0, 3);
   const imageUrl = city.image_url || PLACEHOLDER_IMAGE;
   const truncatedDescription = truncateDescription(city.description);
@@ -39,6 +41,10 @@ export function CityCard({ city, onClick }: CityCardProps) {
       e.preventDefault();
       handleClick();
     }
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   return (
@@ -62,6 +68,14 @@ export function CityCard({ city, onClick }: CityCardProps) {
             target.src = PLACEHOLDER_IMAGE;
           }}
         />
+        {showWishlistButton && (
+          <div 
+            className="absolute top-2 right-2 z-10"
+            onClick={handleWishlistClick}
+          >
+            <WishlistButton city={city} variant="overlay" size="medium" />
+          </div>
+        )}
       </div>
 
       <div className="p-4">

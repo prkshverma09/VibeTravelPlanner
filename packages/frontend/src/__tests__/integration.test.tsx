@@ -62,7 +62,7 @@ describe('Frontend Integration', () => {
     it('should display city cards from search results', async () => {
       const mockHits = mockCities.slice(0, 3);
       
-      render(
+      renderWithProvider(
         <InstantSearchProvider>
           <div data-testid="results">
             {mockHits.map(city => (
@@ -87,7 +87,7 @@ describe('Frontend Integration', () => {
       const trackClick = vi.fn();
       const city = mockCities[0];
 
-      render(
+      renderWithProvider(
         <InstantSearchProvider>
           <CityCard 
             city={city} 
@@ -105,7 +105,7 @@ describe('Frontend Integration', () => {
   describe('Component Rendering', () => {
     it('should render CityCard with all required elements', () => {
       const city = mockCities[0];
-      render(<CityCard city={city} onClick={vi.fn()} />);
+      renderWithProvider(<CityCard city={city} onClick={vi.fn()} />);
 
       expect(screen.getByText(city.city)).toBeInTheDocument();
       expect(screen.getByText(city.country)).toBeInTheDocument();
@@ -167,7 +167,7 @@ describe('Frontend Integration', () => {
     it('should display multiple city cards with different data', () => {
       const cities = mockCities.slice(0, 3);
 
-      render(
+      renderWithProvider(
         <div>
           {cities.map(city => (
             <CityCard key={city.objectID} city={city} onClick={vi.fn()} />
@@ -239,7 +239,7 @@ describe('Frontend Integration', () => {
   describe('Accessibility', () => {
     it('should have accessible city card', () => {
       const city = mockCities[0];
-      render(<CityCard city={city} onClick={vi.fn()} />);
+      renderWithProvider(<CityCard city={city} onClick={vi.fn()} />);
 
       const card = screen.getByRole('article');
       expect(card).toHaveAttribute('aria-label');

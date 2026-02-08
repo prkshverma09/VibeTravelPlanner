@@ -1,111 +1,134 @@
 'use client';
 
-import type { BudgetEstimate, TravelStyle } from '../../services/budget.service';
+import type { BudgetEstimate } from '@/services/budget.service';
+import { formatCurrency } from '@/services/budget.service';
 import styles from './BudgetEstimator.module.css';
 
-interface BudgetEstimatorProps {
+export interface BudgetEstimatorProps {
   estimate: BudgetEstimate;
-  onAddToTrip?: (estimate: BudgetEstimate) => void;
-  onClose?: () => void;
+  showBreakdown?: boolean;
+  showTips?: boolean;
+  onAddToTrip?: () => void;
+  compact?: boolean;
 }
 
-function formatCurrency(amount: number): string {
-  return `$${amount.toLocaleString()}`;
-}
-
-const STYLE_LABELS: Record<TravelStyle, { label: string; emoji: string }> = {
-  budget: { label: 'Budget', emoji: '💰' },
-  'mid-range': { label: 'Mid-Range', emoji: '✨' },
-  luxury: { label: 'Luxury', emoji: '💎' },
-};
-
-const BREAKDOWN_ICONS: Record<string, string> = {
+const CATEGORY_ICONS: Record<string, string> = {
   accommodation: '🏨',
   food: '🍽️',
-  transportation: '🚇',
   activities: '🎭',
+  transport: '🚌',
   miscellaneous: '📦',
 };
 
-export function BudgetEstimator({ estimate, onAddToTrip, onClose }: BudgetEstimatorProps) {
-  const styleInfo = STYLE_LABELS[estimate.travelStyle];
+const CONFIDENCE_LABELS: Record<string, string> = {
+  high: 'High confidence estimate',
+  medium: 'Moderate confidence estimate',
+  low: 'Rough estimate',
+};
+
+export function BudgetEstimator({
+  estimate,
+  showBreakdown = true,
+  showTips = true,
+  onAddToTrip,
+  compact = false,
+}: BudgetEstimatorProps) {
+  const {
+    totalEstimate,
+    perPersonTotal,
+    breakdown,
+    currency,
+    travelStyle,
+    durationDays,
+    travelers,
+    cityName,
+    confidence,
+    tips,
+  } = estimate;
 
   return (
     <div
-      className={styles.container}
+      className={`${styles.budgetEstimator} ${compact ? styles.compact : ''}`}
       data-testid="budget-estimator"
-      role="region"
-      aria-label={`Budget estimate for ${estimate.cityName}`}
     >
-      {onClose && (
-        <button
-          onClick={onClose}
-          className={styles.closeButton}
-          aria-label="Close budget estimator"
+      <div className={styles.header}>
+        <div className={styles.titleSection}>
+          <span className={styles.icon}>💰</span>
+          <div>
+            <h3 className={styles.title}>Trip Budget</h3>
+            <span className={styles.destination}>{cityName}</span>
+          </div>
+        </div>
+        <div
+          className={styles.confidence}
+          data-testid="confidence-indicator"
+          data-confidence={confidence}
         >
-          ×
-        </button>
+          <span className={styles.confidenceDot} />
+          <span className={styles.confidenceLabel}>{CONFIDENCE_LABELS[confidence]}</span>
+        </div>
+      </div>
+
+      <div className={styles.summary}>
+        <div className={styles.totalEstimate}>
+          <span className={styles.totalLabel}>Total Estimated Cost</span>
+          <span className={styles.totalValue}>
+            {formatCurrency(totalEstimate, currency)}
+          </span>
+        </div>
+
+        <div className={styles.details}>
+          <div className={styles.detailItem}>
+            <span className={styles.detailValue}>
+              {formatCurrency(perPersonTotal, currency)}/person
+            </span>
+          </div>
+          <div className={styles.detailItem}>
+            <span className={styles.detailValue}>{durationDays} days</span>
+          </div>
+          <div className={styles.detailItem}>
+            <span className={styles.detailValue}>{travelers} travelers</span>
+          </div>
+          <div className={styles.detailItem}>
+            <span className={styles.travelStyle}>{travelStyle}</span>
+          </div>
+        </div>
+      </div>
+
+      {showBreakdown && (
+        <div className={styles.breakdown}>
+          <h4 className={styles.breakdownTitle}>Cost Breakdown</h4>
+          <div className={styles.breakdownItems}>
+            {Object.entries(breakdown).map(([category, amount]) => (
+              <div key={category} className={styles.breakdownItem}>
+                <div className={styles.categoryInfo}>
+                  <span className={styles.categoryIcon}>
+                    {CATEGORY_ICONS[category] || '📍'}
+                  </span>
+                  <span className={styles.categoryName}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </span>
+                </div>
+                <span className={styles.categoryAmount}>
+                  {formatCurrency(amount, currency)}
+                </span>
+                <div className={styles.progressBar}>
+                  <div
+                    className={styles.progressFill}
+                    style={{ width: `${(amount / totalEstimate) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
-      <div className={styles.header}>
-        <div className={styles.titleRow}>
-          <h3 className={styles.cityName}>{estimate.cityName}</h3>
-          <span className={styles.styleBadge}>
-            {styleInfo.emoji} {styleInfo.label}
-          </span>
-        </div>
-        <div className={styles.tripDetails}>
-          {estimate.durationDays} days • {estimate.travelers} travelers
-        </div>
-      </div>
-
-      <div className={styles.totalSection}>
-        <div className={styles.mainTotal}>
-          <span className={styles.totalLabel}>Estimated Total</span>
-          <span className={styles.totalAmount}>{formatCurrency(estimate.totalEstimate.mid)}</span>
-        </div>
-        <div className={styles.rangeRow}>
-          <span className={styles.rangeLabel}>Range:</span>
-          <span className={styles.rangeValue}>
-            {formatCurrency(estimate.totalEstimate.low)} - {formatCurrency(estimate.totalEstimate.high)}
-          </span>
-        </div>
-      </div>
-
-      <div className={styles.perStats}>
-        <div className={styles.perStat}>
-          <span className={styles.perValue}>{formatCurrency(estimate.perPerson)}</span>
-          <span className={styles.perLabel}>per person</span>
-        </div>
-        <div className={styles.perDivider} />
-        <div className={styles.perStat}>
-          <span className={styles.perValue}>{formatCurrency(estimate.perDay)}</span>
-          <span className={styles.perLabel}>per day</span>
-        </div>
-      </div>
-
-      <div className={styles.breakdownSection}>
-        <h4 className={styles.sectionTitle}>💳 Cost Breakdown</h4>
-        <div className={styles.breakdownList}>
-          {Object.entries(estimate.breakdown).map(([key, value]) => (
-            <div key={key} className={styles.breakdownItem}>
-              <div className={styles.breakdownLabel}>
-                <span className={styles.breakdownIcon}>{BREAKDOWN_ICONS[key]}</span>
-                <span className={styles.breakdownName}>
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </span>
-              </div>
-              <span className={styles.breakdownAmount}>{formatCurrency(value.total)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {estimate.budgetTips.length > 0 && (
-        <div className={styles.tipsSection}>
-          <h4 className={styles.sectionTitle}>💡 Budget Tips</h4>
+      {showTips && tips.length > 0 && (
+        <div className={styles.tips}>
+          <h4 className={styles.tipsTitle}>💡 Budget Tips</h4>
           <ul className={styles.tipsList}>
-            {estimate.budgetTips.map((tip, index) => (
+            {tips.map((tip, index) => (
               <li key={index} className={styles.tipItem}>
                 {tip}
               </li>
@@ -115,13 +138,15 @@ export function BudgetEstimator({ estimate, onAddToTrip, onClose }: BudgetEstima
       )}
 
       {onAddToTrip && (
-        <button
-          onClick={() => onAddToTrip(estimate)}
-          className={styles.addButton}
-          aria-label="Add to trip plan"
-        >
-          Add to Trip
-        </button>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.addButton}
+            onClick={onAddToTrip}
+          >
+            Add to Trip Plan
+          </button>
+        </div>
       )}
     </div>
   );

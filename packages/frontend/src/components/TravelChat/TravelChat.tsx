@@ -544,14 +544,15 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         return (
           <BudgetEstimator
             estimate={message.output.estimate}
-            onAddToTrip={(estimate) => {
-              if (message.output?.city) {
+            onAddToTrip={() => {
+              if (message.output?.city && message.output?.estimate) {
+                const est = message.output.estimate;
                 dispatch({
                   type: 'ADD_TO_TRIP',
                   payload: {
                     city: message.output.city,
-                    durationDays: estimate.durationDays,
-                    notes: `Budget: $${estimate.totalEstimate.mid} (${estimate.travelStyle})`,
+                    durationDays: est.durationDays,
+                    notes: `Budget: $${est.totalEstimate} (${est.travelStyle})`,
                   },
                 });
               }

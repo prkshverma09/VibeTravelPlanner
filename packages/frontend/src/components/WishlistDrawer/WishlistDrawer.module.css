@@ -2,19 +2,31 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 100;
-  display: flex;
-  justify-content: flex-end;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   max-width: 400px;
   background: white;
-  height: 100%;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.3s ease;
 }
 
 @keyframes slideIn {
@@ -28,100 +40,112 @@
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-  color: white;
 }
 
-.headerContent {
+.titleSection {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .title {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
+  color: #1a1a1a;
   margin: 0;
 }
 
+.heartTitleIcon {
+  width: 24px;
+  height: 24px;
+  color: #ef4444;
+}
+
 .count {
-  font-size: 13px;
-  opacity: 0.9;
+  font-size: 0.875rem;
+  color: #666;
 }
 
 .closeButton {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
 }
 
 .closeButton:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #f3f4f6;
+  color: #1a1a1a;
+}
+
+.closeButton svg {
+  width: 20px;
+  height: 20px;
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 1rem;
 }
 
-.emptyState {
+.wishlistItems {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  padding: 40px 20px;
+  gap: 0.75rem;
 }
 
-.emptyIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.emptyText {
-  font-size: 16px;
-  font-weight: 500;
-  color: #4b5563;
-  margin: 0 0 8px 0;
-}
-
-.emptySubtext {
-  font-size: 14px;
-  color: #9ca3af;
-  margin: 0;
-}
-
-.itemsList {
+.wishlistCard {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.item {
+  align-items: stretch;
   background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  transition: all 0.2s;
 }
 
-.itemImage {
-  width: 100%;
-  height: 120px;
+.wishlistCard:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cardContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.cardContent:hover {
+  background: #f3f4f6;
+}
+
+.imageWrapper {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -131,92 +155,107 @@
   object-fit: cover;
 }
 
-.imagePlaceholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
-  font-size: 32px;
-}
-
-.itemContent {
-  padding: 12px;
+.cityInfo {
+  flex: 1;
+  min-width: 0;
 }
 
 .cityName {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #1a1a1a;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.countryName {
-  font-size: 13px;
-  color: #6b7280;
-  margin: 2px 0 0 0;
+.cityCountry {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0.125rem 0 0;
 }
 
 .notes {
-  font-size: 13px;
-  color: #8b5cf6;
+  font-size: 0.75rem;
+  color: #2563eb;
+  margin: 0.375rem 0 0;
   font-style: italic;
-  margin: 8px 0 0 0;
-  padding: 8px;
-  background: #f5f3ff;
-  border-radius: 6px;
-}
-
-.tags {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.tag {
-  font-size: 11px;
-  padding: 3px 8px;
-  background: #e0e7ff;
-  color: #4f46e5;
-  border-radius: 20px;
-}
-
-.itemActions {
-  display: flex;
-  gap: 8px;
-  padding: 0 12px 12px 12px;
-}
-
-.actionButton {
-  flex: 1;
-  padding: 8px 12px;
-  background: #8b5cf6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.actionButton:hover {
-  background: #7c3aed;
 }
 
 .removeButton {
-  padding: 8px 12px;
-  background: white;
-  color: #ef4444;
-  border: 1px solid #ef4444;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid #e5e7eb;
   cursor: pointer;
+  color: #9ca3af;
   transition: all 0.2s;
 }
 
 .removeButton:hover {
   background: #fef2f2;
+  color: #ef4444;
+}
+
+.removeIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.emptyState h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem;
+}
+
+.emptyState p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .drawer {
+    max-width: 100%;
+  }
+
+  .header {
+    padding: 1rem;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+
+  .cardContent {
+    padding: 0.625rem;
+  }
+
+  .imageWrapper {
+    width: 50px;
+    height: 50px;
+  }
 }

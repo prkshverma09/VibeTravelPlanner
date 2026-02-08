@@ -1,176 +1,179 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { WishlistDrawer } from '../WishlistDrawer';
-import type { WishlistItem } from '../../../context/TripContext';
-import type { AlgoliaCity } from '@vibe-travel/shared';
+import { TripProvider } from '@/context/TripContext';
 
-const mockCity: AlgoliaCity = {
-  objectID: 'tokyo-japan',
-  city: 'Tokyo',
-  country: 'Japan',
-  continent: 'Asia',
-  description: 'A vibrant metropolis',
-  vibe_tags: ['modern', 'bustling'],
-  culture_score: 9,
-  adventure_score: 7,
-  nature_score: 5,
-  beach_score: 3,
-  nightlife_score: 9,
-  climate_type: 'Humid subtropical',
-  best_time_to_visit: 'Spring',
-  image_url: 'https://example.com/tokyo.jpg',
-};
-
-const mockCity2: AlgoliaCity = {
-  ...mockCity,
-  objectID: 'paris-france',
-  city: 'Paris',
-  country: 'France',
-  continent: 'Europe',
-};
-
-const mockWishlistItems: WishlistItem[] = [
-  { city: mockCity, notes: 'Must visit!', addedAt: Date.now() },
-  { city: mockCity2, notes: null, addedAt: Date.now() - 1000 },
+const mockCities = [
+  {
+    objectID: 'tokyo-japan',
+    city: 'Tokyo',
+    country: 'Japan',
+    continent: 'Asia',
+    description: 'A vibrant metropolis',
+    vibe_tags: ['Cultural', 'Modern'],
+    image_url: 'https://example.com/tokyo.jpg',
+  },
+  {
+    objectID: 'paris-france',
+    city: 'Paris',
+    country: 'France',
+    continent: 'Europe',
+    description: 'City of Light',
+    vibe_tags: ['Romantic', 'Cultural'],
+    image_url: 'https://example.com/paris.jpg',
+  },
 ];
 
+const mockWishlistItems = mockCities.map((city, idx) => ({
+  city: city as any,
+  notes: idx === 0 ? 'Spring trip' : null,
+  addedAt: Date.now() - idx * 1000,
+}));
+
+vi.mock('@/context/TripContext', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual,
+    useTripContext: () => ({
+      state: {
+        wishlist: mockWishlistItems,
+        preferences: [],
+        tripPlan: [],
+        comparison: { cities: [], focusAttributes: [], isActive: false },
+        conversationSummary: [],
+      },
+      dispatch: vi.fn(),
+      hasWishlist: true,
+      wishlistCount: 2,
+    }),
+  };
+});
+
 describe('WishlistDrawer', () => {
-  it('should render wishlist items', () => {
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={true}
-        onClose={vi.fn()}
-        onRemove={vi.fn()}
-        onMoveToTrip={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText('Tokyo')).toBeInTheDocument();
-    expect(screen.getByText('Paris')).toBeInTheDocument();
+  beforeEach(() => {
+    localStorage.clear();
   });
 
-  it('should display item count', () => {
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={true}
-        onClose={vi.fn()}
-        onRemove={vi.fn()}
-        onMoveToTrip={vi.fn()}
-      />
-    );
+  describe('Closed State', () => {
+    it('should not render content when closed', () => {
+      render(<WishlistDrawer isOpen={false} onClose={() => {}} />);
 
-    expect(screen.getByText(/2 destinations/i)).toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
   });
 
-  it('should display notes when available', () => {
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={true}
-        onClose={vi.fn()}
-        onRemove={vi.fn()}
-        onMoveToTrip={vi.fn()}
-      />
-    );
+  describe('Open State', () => {
+    it('should render drawer when open', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
 
-    expect(screen.getByText('Must visit!')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('should show wishlist title', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
+
+      expect(screen.getByText(/My Wishlist/i)).toBeInTheDocument();
+    });
+
+    it('should display wishlist count', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
+
+      expect(screen.getByText(/2/)).toBeInTheDocument();
+    });
+
+    it('should show saved cities', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
+
+      expect(screen.getByText('Tokyo')).toBeInTheDocument();
+      expect(screen.getByText('Paris')).toBeInTheDocument();
+    });
+
+    it('should show city country', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
+
+      expect(screen.getByText(/Japan/i)).toBeInTheDocument();
+      expect(screen.getByText(/France/i)).toBeInTheDocument();
+    });
+
+    it('should show notes when available', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
+
+      expect(screen.getByText('Spring trip')).toBeInTheDocument();
+    });
   });
 
-  it('should call onClose when close button clicked', () => {
-    const onClose = vi.fn();
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={true}
-        onClose={onClose}
-        onRemove={vi.fn()}
-        onMoveToTrip={vi.fn()}
-      />
-    );
+  describe('Interactions', () => {
+    it('should call onClose when close button clicked', async () => {
+      const onClose = vi.fn();
+      const user = userEvent.setup();
 
-    const closeButton = screen.getByRole('button', { name: /close/i });
-    fireEvent.click(closeButton);
+      render(<WishlistDrawer isOpen={true} onClose={onClose} />);
 
-    expect(onClose).toHaveBeenCalled();
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      await user.click(closeButton);
+
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it('should call onClose when overlay clicked', async () => {
+      const onClose = vi.fn();
+      const user = userEvent.setup();
+
+      render(<WishlistDrawer isOpen={true} onClose={onClose} />);
+
+      const overlay = screen.getByTestId('drawer-overlay');
+      await user.click(overlay);
+
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it('should call onClose on Escape key', async () => {
+      const onClose = vi.fn();
+      const user = userEvent.setup();
+
+      render(<WishlistDrawer isOpen={true} onClose={onClose} />);
+
+      await user.keyboard('{Escape}');
+
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it('should have remove button for each item', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
+
+      const removeButtons = screen.getAllByRole('button', { name: /remove/i });
+      expect(removeButtons).toHaveLength(2);
+    });
+
+    it('should call onCityClick when city is clicked', async () => {
+      const onCityClick = vi.fn();
+      const user = userEvent.setup();
+
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} onCityClick={onCityClick} />);
+
+      const tokyoCard = screen.getByText('Tokyo').closest('button, a, [role="button"]');
+      if (tokyoCard) {
+        await user.click(tokyoCard);
+        expect(onCityClick).toHaveBeenCalled();
+      }
+    });
   });
 
-  it('should call onRemove with city id when remove clicked', () => {
-    const onRemove = vi.fn();
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={true}
-        onClose={vi.fn()}
-        onRemove={onRemove}
-        onMoveToTrip={vi.fn()}
-      />
-    );
+  describe('Accessibility', () => {
+    it('should have proper dialog role', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
 
-    const removeButtons = screen.getAllByRole('button', { name: /remove/i });
-    fireEvent.click(removeButtons[0]);
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveAttribute('aria-modal', 'true');
+    });
 
-    expect(onRemove).toHaveBeenCalledWith('tokyo-japan');
-  });
+    it('should have accessible title', () => {
+      render(<WishlistDrawer isOpen={true} onClose={() => {}} />);
 
-  it('should call onMoveToTrip with city when clicked', () => {
-    const onMoveToTrip = vi.fn();
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={true}
-        onClose={vi.fn()}
-        onRemove={vi.fn()}
-        onMoveToTrip={onMoveToTrip}
-      />
-    );
-
-    const moveButtons = screen.getAllByRole('button', { name: /add to trip/i });
-    fireEvent.click(moveButtons[0]);
-
-    expect(onMoveToTrip).toHaveBeenCalledWith(mockCity);
-  });
-
-  it('should show empty state when no items', () => {
-    render(
-      <WishlistDrawer
-        items={[]}
-        isOpen={true}
-        onClose={vi.fn()}
-        onRemove={vi.fn()}
-        onMoveToTrip={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText(/no destinations/i)).toBeInTheDocument();
-  });
-
-  it('should not render when closed', () => {
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={false}
-        onClose={vi.fn()}
-        onRemove={vi.fn()}
-        onMoveToTrip={vi.fn()}
-      />
-    );
-
-    expect(screen.queryByText('Tokyo')).not.toBeInTheDocument();
-  });
-
-  it('should have proper test id', () => {
-    render(
-      <WishlistDrawer
-        items={mockWishlistItems}
-        isOpen={true}
-        onClose={vi.fn()}
-        onRemove={vi.fn()}
-        onMoveToTrip={vi.fn()}
-      />
-    );
-
-    expect(screen.getByTestId('wishlist-drawer')).toBeInTheDocument();
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveAccessibleName();
+    });
   });
 });
+

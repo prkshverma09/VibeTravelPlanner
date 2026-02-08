@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { VibeTag } from '@/components/VibeTag';
 import { ScoreBadge } from '@/components/ScoreBadge';
+import { PlanTripButton } from '@/components/PlanTripButton';
 import type { AlgoliaCity } from '@vibe-travel/shared';
 
 interface CityDetailPageProps {
@@ -77,8 +78,21 @@ export default async function CityDetailPage({ params }: CityDetailPageProps) {
           >
             ← Back to search
           </Link>
-          <h1 className="text-4xl font-bold mb-2">{city.city}</h1>
-          <p className="text-xl text-white/90">{city.country} • {city.continent}</p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">{city.city}</h1>
+              <p className="text-xl text-white/90">{city.country} • {city.continent}</p>
+            </div>
+            <PlanTripButton
+              destination={{
+                objectID: city.objectID,
+                city: city.city,
+                country: city.country,
+                continent: city.continent,
+                bestTimeToVisit: city.best_time_to_visit,
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -120,6 +134,25 @@ export default async function CityDetailPage({ params }: CityDetailPageProps) {
               <p className="font-medium" data-testid="best-time">{city.best_time_to_visit}</p>
             </div>
           </div>
+        </section>
+
+        <section className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-8 text-center text-white">
+          <h2 className="text-2xl font-bold mb-2">Ready to explore {city.city}?</h2>
+          <p className="text-white/90 mb-6 max-w-md mx-auto">
+            Create your personalized itinerary with AI-powered recommendations tailored to your interests.
+          </p>
+          <PlanTripButton
+            destination={{
+              objectID: city.objectID,
+              city: city.city,
+              country: city.country,
+              continent: city.continent,
+              bestTimeToVisit: city.best_time_to_visit,
+            }}
+            buttonText="Start Planning Your Trip"
+            variant="secondary"
+            className="bg-white text-blue-600 hover:bg-blue-50 border-none"
+          />
         </section>
       </div>
     </main>

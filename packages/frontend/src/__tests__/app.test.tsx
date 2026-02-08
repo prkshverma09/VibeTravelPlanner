@@ -87,12 +87,12 @@ describe('App', () => {
     });
   });
 
-  it('should render continent tags', async () => {
+  it('should render city locations', async () => {
     renderWithProvider(<HomePage />);
     
     await waitFor(() => {
-      expect(screen.getByText('Asia')).toBeInTheDocument();
-      expect(screen.getByText('Europe')).toBeInTheDocument();
+      expect(screen.getByText('Japan')).toBeInTheDocument();
+      expect(screen.getByText('France')).toBeInTheDocument();
     });
   });
 });

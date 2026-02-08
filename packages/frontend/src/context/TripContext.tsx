@@ -1,8 +1,10 @@
 'use client';
 
-import { createContext, useContext, useReducer, useMemo } from 'react';
+import { createContext, useContext, useReducer, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AlgoliaCity } from '@vibe-travel/shared';
+
+const WISHLIST_STORAGE_KEY = 'vibe-travel-wishlist';
 
 export type PreferenceCategory =
   | 'vibe'
@@ -61,6 +63,7 @@ type TripAction =
   | { type: 'ADD_TO_WISHLIST'; payload: Omit<WishlistItem, 'addedAt'> }
   | { type: 'REMOVE_FROM_WISHLIST'; payload: { cityId: string } }
   | { type: 'CLEAR_WISHLIST' }
+  | { type: 'SET_WISHLIST'; payload: WishlistItem[] }
   | { type: 'RESET_ALL' };
 
 const initialState: TripState = {
@@ -171,6 +174,9 @@ function tripReducer(state: TripState, action: TripAction): TripState {
     case 'CLEAR_WISHLIST':
       return { ...state, wishlist: [] };
 
+    case 'SET_WISHLIST':
+      return { ...state, wishlist: action.payload };
+
     case 'RESET_ALL':
       return initialState;
 
@@ -198,6 +204,21 @@ interface TripProviderProps {
 
 export function TripProvider({ children }: TripProviderProps) {
   const [state, dispatch] = useReducer(tripReducer, initialState);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stored = localStorage.getItem(WISHLIST_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          dispatch({ type: 'SET_WISHLIST', payload: parsed });
+        }
+      }
+    } catch {
+    }
+  }, []);
 
   const activePreferencesText = useMemo(() => {
     if (state.preferences.length === 0) return '';

@@ -1,40 +1,20 @@
-.container {
+.weatherCard {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 16px;
-  padding: 20px;
+  padding: 1.5rem;
   color: white;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-  margin: 12px 0;
+  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
 }
 
-.closeButton {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-
-.closeButton:hover {
-  background: rgba(255, 255, 255, 0.3);
+.compact {
+  padding: 1rem;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .location {
@@ -43,152 +23,249 @@
 }
 
 .city {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin: 0;
+  line-height: 1.2;
 }
 
 .country {
-  font-size: 14px;
+  font-size: 0.875rem;
   opacity: 0.8;
+}
+
+.weatherIcon {
+  font-size: 3rem;
+}
+
+.compact .weatherIcon {
+  font-size: 2rem;
 }
 
 .currentWeather {
   display: flex;
-  flex-direction: column;
   align-items: flex-end;
-}
-
-.weatherIcon {
-  font-size: 48px;
-  line-height: 1;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .temperature {
-  font-size: 36px;
-  font-weight: 700;
+  display: flex;
+  align-items: flex-start;
 }
 
-.description {
-  font-size: 14px;
-  opacity: 0.9;
+.tempValue {
+  font-size: 4rem;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.compact .tempValue {
+  font-size: 2.5rem;
+}
+
+.tempUnit {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.condition {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.5rem;
+}
+
+.conditionText {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.feelsLike {
+  font-size: 0.875rem;
+  opacity: 0.8;
 }
 
 .details {
-  display: flex;
-  gap: 16px;
-  padding: 12px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.compact .details {
+  margin-bottom: 0;
 }
 
 .detailItem {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  text-align: center;
+}
+
+.detailIcon {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .detailLabel {
-  font-size: 11px;
-  opacity: 0.7;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  opacity: 0.8;
 }
 
 .detailValue {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .forecast {
-  margin-bottom: 16px;
+  margin-bottom: 1.5rem;
 }
 
 .forecastTitle {
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 600;
-  margin: 0 0 12px 0;
-  opacity: 0.9;
+  margin: 0 0 0.75rem;
 }
 
 .forecastDays {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
+  gap: 0.5rem;
 }
 
 .forecastDay {
   flex: 1;
-  min-width: 60px;
-  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 10px 8px;
+  text-align: center;
+}
+
+.forecastDate {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.forecastIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.forecastTemps {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  gap: 0.5rem;
 }
 
-.dayName {
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.dayIcon {
-  font-size: 24px;
-}
-
-.dayTemps {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.tempMax {
-  font-size: 14px;
+.forecastHigh {
   font-weight: 600;
 }
 
-.tempMin {
-  font-size: 12px;
+.forecastLow {
   opacity: 0.7;
 }
 
-.precipitation {
-  font-size: 11px;
+.precipChance {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  opacity: 0.9;
+}
+
+.advice {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.adviceTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.adviceTitle::before {
+  content: '💡';
+}
+
+.adviceText {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.95;
+}
+
+.activities {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.activitiesTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activitiesTitle::before {
+  content: '🎯';
+}
+
+.activityList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.activityItem {
+  font-size: 0.875rem;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.activityItem::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
   opacity: 0.8;
 }
 
-.recommendations,
-.activities {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
+@media (max-width: 480px) {
+  .weatherCard {
+    padding: 1rem;
+  }
 
-.recommendations:last-child,
-.activities:last-child {
-  margin-bottom: 0;
-}
+  .tempValue {
+    font-size: 3rem;
+  }
 
-.recommendationsTitle,
-.activitiesTitle {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-}
+  .details {
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
 
-.recommendationsList,
-.activitiesList {
-  margin: 0;
-  padding-left: 20px;
-}
+  .forecastDays {
+    flex-direction: column;
+  }
 
-.recommendationItem,
-.activityItem {
-  font-size: 13px;
-  line-height: 1.5;
-  opacity: 0.9;
+  .forecastDay {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+  }
 }

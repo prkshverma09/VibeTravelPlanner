@@ -48,6 +48,26 @@ export interface City {
 
 export interface AlgoliaCity extends City {
   objectID: string;
+  average_cost_per_day?: number;
+  currency?: string;
+  review_count?: number;
+  rating?: number;
+  best_months?: number[];
+  latitude?: number;
+  longitude?: number;
+  known_for?: string[];
+  cuisine_variety?: string[];
+  ideal_trip_length?: string;
+  visa_requirements?: string;
+  safety_rating?: number;
+  lgbtq_friendly?: boolean;
+  family_friendly?: boolean;
+  solo_traveler_friendly?: boolean;
+  digital_nomad_friendly?: boolean;
+  language?: string[];
+  timezone?: string;
+  airport_codes?: string[];
+  relaxation_score?: number;
 }
 
 export interface EnhancedCity extends City {
