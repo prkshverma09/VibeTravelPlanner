@@ -7,6 +7,9 @@ import { WishlistButton } from '@/components/WishlistButton';
 interface CityCardProps {
   city: AlgoliaCity;
   onClick?: (city: AlgoliaCity) => void;
+  onMouseEnter?: (city: AlgoliaCity) => void;
+  onMouseLeave?: () => void;
+  isHighlighted?: boolean;
   showWishlistButton?: boolean;
 }
 
@@ -25,7 +28,14 @@ function truncateDescription(text: string, maxLength: number = 150): string {
   return truncated + '...';
 }
 
-export function CityCard({ city, onClick, showWishlistButton = true }: CityCardProps) {
+export function CityCard({
+  city,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  isHighlighted = false,
+  showWishlistButton = true,
+}: CityCardProps) {
   const displayTags = city.vibe_tags.slice(0, 3);
   const imageUrl = city.image_url || PLACEHOLDER_IMAGE;
   const truncatedDescription = truncateDescription(city.description);
@@ -47,9 +57,16 @@ export function CityCard({ city, onClick, showWishlistButton = true }: CityCardP
     e.stopPropagation();
   };
 
+  const articleClass = [
+    'bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2',
+    isHighlighted ? 'ring-2 ring-purple-500 shadow-lg' : '',
+  ].join(' ');
+
   return (
     <article
-      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+      className={articleClass}
+      onMouseEnter={() => onMouseEnter?.(city)}
+      onMouseLeave={() => onMouseLeave?.()}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role="article"

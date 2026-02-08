@@ -193,7 +193,7 @@ export function getPackingList(weather: WeatherData): string[] {
     items.push('Moisture-wicking fabrics', 'Extra change of clothes');
   }
 
-  return [...new Set(items)];
+  return Array.from(new Set(items));
 }
 
 export function getWeatherIcon(condition: WeatherCondition): string {

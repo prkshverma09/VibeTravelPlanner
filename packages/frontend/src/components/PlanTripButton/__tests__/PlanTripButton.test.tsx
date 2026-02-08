@@ -111,7 +111,7 @@ describe('PlanTripButton', () => {
     it('should pass onComplete callback to wizard', async () => {
       const mockOnComplete = vi.fn();
       const user = userEvent.setup();
-      
+
       render(
         <PlanTripButton
           destination={mockDestination}
@@ -126,6 +126,87 @@ describe('PlanTripButton', () => {
       });
 
       expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
+
+    it('should show itinerary after completing wizard with Start Planning', async () => {
+      const user = userEvent.setup();
+      render(<PlanTripButton destination={mockDestination} />);
+
+      await user.click(screen.getByRole('button', { name: /plan.*trip/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('trip-setup-wizard')).toBeInTheDocument();
+      });
+
+      const startInput = screen.getByLabelText(/start date/i);
+      await user.clear(startInput);
+      await user.type(startInput, '2026-03-01');
+      const endInput = screen.getByLabelText(/end date/i);
+      await user.clear(endInput);
+      await user.type(endInput, '2026-03-03');
+
+      await user.click(screen.getByRole('button', { name: /continue/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('step-travelers')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /continue/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('step-preferences')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /continue/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('step-review')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /start planning/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('itinerary-builder')).toBeInTheDocument();
+      });
+      expect(screen.getByTestId('itinerary-back-to-edit')).toBeInTheDocument();
+      expect(screen.getByTestId('itinerary-close')).toBeInTheDocument();
+    });
+
+    it('should return to wizard when Back to edit is clicked from itinerary', async () => {
+      const user = userEvent.setup();
+      render(<PlanTripButton destination={mockDestination} />);
+
+      await user.click(screen.getByRole('button', { name: /plan.*trip/i }));
+      await waitFor(() => {
+        expect(screen.getByTestId('trip-setup-wizard')).toBeInTheDocument();
+      });
+
+      const startInput = screen.getByLabelText(/start date/i);
+      await user.clear(startInput);
+      await user.type(startInput, '2026-03-01');
+      const endInput = screen.getByLabelText(/end date/i);
+      await user.clear(endInput);
+      await user.type(endInput, '2026-03-03');
+      await user.click(screen.getByRole('button', { name: /continue/i }));
+      await waitFor(() => {
+        expect(screen.getByTestId('step-travelers')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /continue/i }));
+      await waitFor(() => {
+        expect(screen.getByTestId('step-preferences')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /continue/i }));
+      await waitFor(() => {
+        expect(screen.getByTestId('step-review')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /start planning/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('itinerary-back-to-edit')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByTestId('itinerary-back-to-edit'));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('trip-setup-wizard')).toBeInTheDocument();
+      });
     });
   });
 

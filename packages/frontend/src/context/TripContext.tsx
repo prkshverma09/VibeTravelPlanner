@@ -48,6 +48,9 @@ export interface TripState {
   comparison: ComparisonState;
   conversationSummary: string[];
   wishlist: WishlistItem[];
+  chatResults: AlgoliaCity[];
+  hoveredCityId: string | null;
+  mapBounds: { north: number; south: number; east: number; west: number } | null;
 }
 
 type TripAction =
@@ -56,6 +59,7 @@ type TripAction =
   | { type: 'CLEAR_PREFERENCES'; payload: { category: string | 'all' } }
   | { type: 'ADD_TO_TRIP'; payload: Omit<TripDestination, 'addedAt'> }
   | { type: 'REMOVE_FROM_TRIP'; payload: { cityId: string } }
+  | { type: 'REORDER_TRIP'; payload: { fromIndex: number; toIndex: number } }
   | { type: 'CLEAR_TRIP' }
   | { type: 'SET_COMPARISON'; payload: ComparisonState }
   | { type: 'CLEAR_COMPARISON' }
@@ -64,6 +68,13 @@ type TripAction =
   | { type: 'REMOVE_FROM_WISHLIST'; payload: { cityId: string } }
   | { type: 'CLEAR_WISHLIST' }
   | { type: 'SET_WISHLIST'; payload: WishlistItem[] }
+  | { type: 'SET_CHAT_RESULTS'; payload: AlgoliaCity[] }
+  | { type: 'ADD_CHAT_RESULT'; payload: AlgoliaCity }
+  | { type: 'SET_HOVERED_CITY'; payload: string | null }
+  | {
+      type: 'SET_MAP_BOUNDS';
+      payload: { north: number; south: number; east: number; west: number } | null;
+    }
   | { type: 'RESET_ALL' };
 
 const initialState: TripState = {
@@ -76,6 +87,9 @@ const initialState: TripState = {
   },
   conversationSummary: [],
   wishlist: [],
+  chatResults: [],
+  hoveredCityId: null,
+  mapBounds: null,
 };
 
 function tripReducer(state: TripState, action: TripAction): TripState {
@@ -135,6 +149,14 @@ function tripReducer(state: TripState, action: TripAction): TripState {
         tripPlan: state.tripPlan.filter((d) => d.city.objectID !== action.payload.cityId),
       };
 
+    case 'REORDER_TRIP': {
+      const { fromIndex, toIndex } = action.payload;
+      const plan = [...state.tripPlan];
+      const [removed] = plan.splice(fromIndex, 1);
+      plan.splice(toIndex, 0, removed);
+      return { ...state, tripPlan: plan };
+    }
+
     case 'CLEAR_TRIP':
       return { ...state, tripPlan: [] };
 
@@ -176,6 +198,35 @@ function tripReducer(state: TripState, action: TripAction): TripState {
 
     case 'SET_WISHLIST':
       return { ...state, wishlist: action.payload };
+
+    case 'SET_CHAT_RESULTS':
+      return { ...state, chatResults: action.payload };
+
+    case 'ADD_CHAT_RESULT': {
+      const MAX_CHAT_RESULTS = 3;
+      const newCity = action.payload;
+      const existsById = state.chatResults.some(
+        (c) => c.objectID === newCity.objectID
+      );
+      const existsByName = state.chatResults.some(
+        (c) =>
+          c.city &&
+          newCity.city &&
+          c.city.toLowerCase() === newCity.city.toLowerCase()
+      );
+      if (existsById || existsByName) return state;
+      const updated = [...state.chatResults, newCity];
+      return {
+        ...state,
+        chatResults: updated.slice(-MAX_CHAT_RESULTS),
+      };
+    }
+
+    case 'SET_HOVERED_CITY':
+      return { ...state, hoveredCityId: action.payload };
+
+    case 'SET_MAP_BOUNDS':
+      return { ...state, mapBounds: action.payload };
 
     case 'RESET_ALL':
       return initialState;

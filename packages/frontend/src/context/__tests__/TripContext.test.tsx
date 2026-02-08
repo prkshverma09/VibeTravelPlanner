@@ -32,6 +32,198 @@ describe('TripContext', () => {
       expect(result.current.hasTripPlan).toBe(false);
       expect(result.current.activePreferencesText).toBe('');
     });
+
+    it('should have empty chatResults initially', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+      expect(result.current.state.chatResults).toEqual([]);
+    });
+
+    it('should have null hoveredCityId initially', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+      expect(result.current.state.hoveredCityId).toBeNull();
+    });
+
+    it('should have null mapBounds initially', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+      expect(result.current.state.mapBounds).toBeNull();
+    });
+  });
+
+  describe('chat results', () => {
+    it('should set chat results', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'SET_CHAT_RESULTS',
+          payload: mockCities.slice(0, 2),
+        });
+      });
+
+      expect(result.current.state.chatResults).toHaveLength(2);
+      expect(result.current.state.chatResults[0].objectID).toBe(
+        mockCities[0].objectID
+      );
+    });
+
+    it('should add single chat result without duplicate', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_CHAT_RESULT',
+          payload: mockCities[0],
+        });
+      });
+      expect(result.current.state.chatResults).toHaveLength(1);
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_CHAT_RESULT',
+          payload: mockCities[0],
+        });
+      });
+      expect(result.current.state.chatResults).toHaveLength(1);
+    });
+
+    it('should add multiple chat results', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_CHAT_RESULT',
+          payload: mockCities[0],
+        });
+        result.current.dispatch({
+          type: 'ADD_CHAT_RESULT',
+          payload: mockCities[1],
+        });
+      });
+
+      expect(result.current.state.chatResults).toHaveLength(2);
+    });
+  });
+
+  describe('hovered city', () => {
+    it('should set hovered city id', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'SET_HOVERED_CITY',
+          payload: 'paris-france',
+        });
+      });
+
+      expect(result.current.state.hoveredCityId).toBe('paris-france');
+    });
+
+    it('should clear hovered city', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'SET_HOVERED_CITY',
+          payload: 'paris-france',
+        });
+      });
+      expect(result.current.state.hoveredCityId).toBe('paris-france');
+
+      act(() => {
+        result.current.dispatch({ type: 'SET_HOVERED_CITY', payload: null });
+      });
+      expect(result.current.state.hoveredCityId).toBeNull();
+    });
+  });
+
+  describe('map bounds', () => {
+    it('should set map bounds', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+      const bounds = {
+        north: 50,
+        south: 40,
+        east: 10,
+        west: 0,
+      };
+
+      act(() => {
+        result.current.dispatch({
+          type: 'SET_MAP_BOUNDS',
+          payload: bounds,
+        });
+      });
+
+      expect(result.current.state.mapBounds).toEqual(bounds);
+    });
+
+    it('should clear map bounds', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'SET_MAP_BOUNDS',
+          payload: {
+            north: 50,
+            south: 40,
+            east: 10,
+            west: 0,
+          },
+        });
+      });
+
+      act(() => {
+        result.current.dispatch({ type: 'SET_MAP_BOUNDS', payload: null });
+      });
+      expect(result.current.state.mapBounds).toBeNull();
+    });
+  });
+
+  describe('reorder trip', () => {
+    it('should reorder trip plan', () => {
+      const { result } = renderHook(() => useTripContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: 'ADD_TO_TRIP',
+          payload: {
+            city: mockCities[0],
+            durationDays: 1,
+            notes: null,
+          },
+        });
+        result.current.dispatch({
+          type: 'ADD_TO_TRIP',
+          payload: {
+            city: mockCities[1],
+            durationDays: 2,
+            notes: null,
+          },
+        });
+        result.current.dispatch({
+          type: 'ADD_TO_TRIP',
+          payload: {
+            city: mockCities[2],
+            durationDays: 3,
+            notes: null,
+          },
+        });
+      });
+
+      expect(result.current.state.tripPlan.map((d) => d.city.objectID)).toEqual(
+        [mockCities[0].objectID, mockCities[1].objectID, mockCities[2].objectID]
+      );
+
+      act(() => {
+        result.current.dispatch({
+          type: 'REORDER_TRIP',
+          payload: { fromIndex: 0, toIndex: 2 },
+        });
+      });
+
+      expect(result.current.state.tripPlan.map((d) => d.city.objectID)).toEqual(
+        [mockCities[1].objectID, mockCities[2].objectID, mockCities[0].objectID]
+      );
+    });
   });
 
   describe('preferences management', () => {
@@ -432,11 +624,26 @@ describe('TripContext', () => {
           type: 'ADD_CONVERSATION_SUMMARY',
           payload: 'Test summary',
         });
+        result.current.dispatch({
+          type: 'SET_CHAT_RESULTS',
+          payload: mockCities.slice(0, 1),
+        });
+        result.current.dispatch({
+          type: 'SET_HOVERED_CITY',
+          payload: 'paris-france',
+        });
+        result.current.dispatch({
+          type: 'SET_MAP_BOUNDS',
+          payload: { north: 50, south: 40, east: 10, west: 0 },
+        });
       });
 
       expect(result.current.state.preferences).toHaveLength(1);
       expect(result.current.state.tripPlan).toHaveLength(1);
       expect(result.current.state.comparison.isActive).toBe(true);
+      expect(result.current.state.chatResults).toHaveLength(1);
+      expect(result.current.state.hoveredCityId).toBe('paris-france');
+      expect(result.current.state.mapBounds).not.toBeNull();
 
       act(() => {
         result.current.dispatch({ type: 'RESET_ALL' });
@@ -446,6 +653,9 @@ describe('TripContext', () => {
       expect(result.current.state.tripPlan).toHaveLength(0);
       expect(result.current.state.comparison.isActive).toBe(false);
       expect(result.current.state.conversationSummary).toHaveLength(0);
+      expect(result.current.state.chatResults).toHaveLength(0);
+      expect(result.current.state.hoveredCityId).toBeNull();
+      expect(result.current.state.mapBounds).toBeNull();
     });
   });
 

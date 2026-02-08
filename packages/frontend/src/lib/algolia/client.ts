@@ -167,7 +167,9 @@ export async function searchWithEnhancement(
     knownVibeTags.some(tag => tag.includes(word) || word.includes(tag))
   );
   
-  const allMatchingTags = [...new Set([...matchingQueryTags, ...matchingTags])].slice(0, 3);
+  const allMatchingTags = Array.from(
+    new Set([...matchingQueryTags, ...matchingTags])
+  ).slice(0, 3);
   
   const searchQueries = allMatchingTags.length > 0
     ? [allMatchingTags.join(' '), query]

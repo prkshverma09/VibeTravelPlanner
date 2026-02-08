@@ -99,7 +99,7 @@
 
 /* Chat Messages Container */
 .algoliaChatMessages {
-  @apply flex-1 overflow-hidden;
+  @apply flex-1 overflow-hidden relative;
 }
 
 .algoliaChatMessagesContent {
@@ -111,7 +111,7 @@
 }
 
 .algoliaChatScrollToBottom {
-  @apply absolute bottom-20 right-4 p-2 bg-white shadow-lg rounded-full text-gray-500 hover:text-gray-700 transition-colors;
+  @apply absolute bottom-4 right-4 p-2 bg-white shadow-lg rounded-full text-gray-500 hover:text-gray-700 transition-colors z-10;
 }
 
 /* Chat Prompt Area */
@@ -144,142 +144,64 @@
   @apply bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm font-medium my-2;
 }
 
-/* Hide default Algolia Chat item list UI (results count, view all) that appears with tool outputs */
-.chatWidget :global(.ais-Chat-itemList-header),
-.chatWidget :global(.ais-Chat-itemList-footer),
-.chatWidget :global(.ais-ChatMessage-itemList-header),
-.chatWidget :global(.ais-ChatMessage-itemList-footer),
-.chatWidget :global(.ais-ChatMessage-itemsHeader),
-.chatWidget :global(.ais-ChatMessage-itemsFooter),
-.chatWidget :global(.ais-ChatMessage-items-header),
-.chatWidget :global(.ais-ChatMessage-items-footer),
-.chatWidget :global([class*="itemList-header"]),
-.chatWidget :global([class*="itemList-footer"]),
-.chatWidget :global([class*="itemsHeader"]),
-.chatWidget :global([class*="itemsFooter"]),
-.chatWidget :global([class*="viewAll"]),
-.chatWidget :global([class*="ViewAll"]),
-.chatWidget :global([class*="results-count"]),
-.chatWidget :global([class*="resultsCount"]),
-.chatWidget :global([class*="ItemsHeader"]),
-.chatWidget :global([class*="ItemsFooter"]) {
+/* Hide the Algolia Chat carousel header (result count, "View all", scroll arrows) */
+.chatWidget :global(.ais-ChatToolSearchIndexCarouselHeader) {
   display: none !important;
 }
 
-/* Also hide the "X of Y results" and "View all" text patterns */
-.chatWidget :global(.ais-ChatMessage) > div:has(> a[href*="view"]),
-.chatWidget :global([class*="Message"]) :global([class*="pagination"]),
-.chatWidget :global([class*="Message"]) :global([class*="Pagination"]) {
-  display: none !important;
+/* Enhanced Search Section - rendered below the chat widget */
+.enhancedSearchSection {
+  @apply px-4 py-3 border-t border-purple-100 bg-gradient-to-r from-purple-50/50 to-pink-50/50;
 }
 
-/* Fallback Results Styles */
-.fallbackResults {
-  @apply border-t border-purple-100 bg-purple-50 p-4 mt-2;
+.enhancedSearchPrompt {
+  @apply text-sm text-gray-600 mb-2 text-center;
 }
 
-.fallbackHeader {
-  @apply flex items-center justify-between mb-2;
-}
-
-.fallbackTitle {
-  @apply text-sm font-semibold text-purple-700 flex items-center gap-2;
-}
-
-.fallbackTitle::before {
-  content: '✨';
-}
-
-.fallbackDismiss {
-  @apply w-6 h-6 flex items-center justify-center text-purple-400 hover:text-purple-600 hover:bg-purple-100 rounded-full transition-colors cursor-pointer border-0 bg-transparent text-lg leading-none;
-}
-
-.fallbackDescription {
-  @apply text-xs text-purple-600 mb-3;
-}
-
-.fallbackGrid {
-  @apply grid grid-cols-1 sm:grid-cols-2 gap-3;
-}
-
-/* Enhanced Search Button */
 .enhancedSearchButton {
-  @apply w-full py-2 px-4 text-sm text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors cursor-pointer mt-2 font-medium;
+  @apply w-full py-2.5 px-4 text-sm font-medium text-purple-700 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 rounded-lg transition-all cursor-pointer;
 }
 
 .enhancedSearchButton:hover {
-  @apply border-purple-300;
+  @apply border-purple-300 shadow-sm;
 }
 
 /* Enhancing Indicator */
 .enhancingIndicator {
-  @apply w-full py-2 px-4 text-sm text-purple-500 bg-purple-50 border border-purple-100 rounded-lg mt-2 text-center animate-pulse;
-}
-
-/* Enhanced Search Portal - injected into chat messages */
-.enhancedSearchPortal {
-  @apply w-full;
-}
-
-/* In-Chat Message Container - mimics assistant message style */
-.inChatMessage {
-  @apply flex gap-3 px-4 py-3;
-}
-
-.messageAvatar {
-  @apply w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm flex-shrink-0;
-}
-
-/* In-Chat Action Container */
-.inChatAction {
-  @apply flex-1 bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm border border-gray-100;
-}
-
-.inChatPrompt {
-  @apply text-sm text-gray-600 mb-3;
-}
-
-/* In-Chat Enhanced Search Button */
-.inChatEnhancedButton {
-  @apply w-full py-2.5 px-4 text-sm font-medium text-purple-700 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2;
-}
-
-.inChatEnhancedButton:hover {
-  @apply border-purple-300 shadow-sm;
-}
-
-/* In-Chat Loading */
-.inChatLoading {
-  @apply flex-1 bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm border border-gray-100 flex items-center gap-2 text-sm text-purple-600;
+  @apply flex items-center justify-center gap-2 py-2 px-4 text-sm text-purple-500;
 }
 
 .loadingSpinner {
   @apply w-4 h-4 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin;
 }
 
-/* In-Chat Results */
-.inChatResults {
-  @apply flex-1 bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm border border-gray-100;
+/* Enhanced Search Results Section */
+.enhancedResultsSection {
+  @apply px-4 py-4 border-t border-purple-100 bg-white;
 }
 
-.inChatResultsHeader {
-  @apply flex items-center justify-between mb-2 text-sm font-semibold text-purple-700;
+.enhancedResultsHeader {
+  @apply flex items-center justify-between mb-2;
 }
 
-.inChatDismiss {
+.enhancedResultsTitle {
+  @apply text-sm font-semibold text-purple-700;
+}
+
+.enhancedResultsDismiss {
   @apply w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors cursor-pointer border-0 bg-transparent text-lg leading-none;
 }
 
-.inChatResultsDescription {
+.enhancedResultsDescription {
   @apply text-xs text-gray-500 mb-3;
 }
 
-.inChatResultsGrid {
+.enhancedResultsGrid {
   @apply grid grid-cols-1 gap-3;
 }
 
 @media (min-width: 640px) {
-  .inChatResultsGrid {
+  .enhancedResultsGrid {
     @apply grid-cols-2;
   }
 }
@@ -293,15 +215,19 @@
   @apply border-purple-300;
 }
 
-/* Hide results count and pagination from Algolia Chat */
-.chatWidget :global([class*="results"]),
-.chatWidget :global([class*="Results"]),
-.inChatResults :global([class*="results"]),
-.inChatResults :global([class*="Results"]) {
-  display: none !important;
+/* Ensure our enhanced results grid is visible */
+.enhancedResultsGrid {
+  display: grid !important;
 }
 
-/* Ensure our grid is visible */
-.inChatResultsGrid {
-  display: grid !important;
+.miniMapWrap {
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.compareWithMap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }

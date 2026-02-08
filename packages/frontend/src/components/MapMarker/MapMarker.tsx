@@ -10,16 +10,24 @@ interface MapMarkerProps {
   city: AlgoliaCity;
   isSelected?: boolean;
   isInItinerary?: boolean;
+  isHovered?: boolean;
+  isDimmed?: boolean;
   itineraryOrder?: number;
   onClick?: (city: AlgoliaCity) => void;
+  onMouseEnter?: (city: AlgoliaCity) => void;
+  onMouseLeave?: () => void;
 }
 
 export const MapMarker = memo(function MapMarker({
   city,
   isSelected,
   isInItinerary,
+  isHovered,
+  isDimmed,
   itineraryOrder,
-  onClick
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: MapMarkerProps) {
   if (!city._geoloc) return null;
 
@@ -38,9 +46,11 @@ export const MapMarker = memo(function MapMarker({
       anchor="bottom"
     >
       <button
-        className={`${styles.marker} ${isSelected ? styles.selected : ''} ${isInItinerary ? styles.inItinerary : ''}`}
+        className={`${styles.marker} ${isSelected ? styles.selected : ''} ${isInItinerary ? styles.inItinerary : ''} ${isHovered ? styles.hovered : ''} ${isDimmed ? styles.dimmed : ''}`}
         style={{ '--marker-color': color } as React.CSSProperties}
         onClick={handleClick}
+        onMouseEnter={() => onMouseEnter?.(city)}
+        onMouseLeave={() => onMouseLeave?.()}
         aria-label={`View ${city.city}, ${city.country}`}
         type="button"
         data-testid="map-marker"

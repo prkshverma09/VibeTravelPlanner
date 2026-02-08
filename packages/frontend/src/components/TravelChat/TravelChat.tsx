@@ -1,7 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect, useRef, Suspense, lazy, Component, ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useState, useEffect, Suspense, lazy, Component, ReactNode, useMemo, useRef, memo } from 'react';
 import { getAgentId, fetchCityById, fetchCitiesByIds, searchWithEnhancement } from '@/lib/algolia';
 import { CityCard } from '@/components/CityCard';
 import { ActivePreferences } from '@/components/ActivePreferences';
@@ -9,6 +8,7 @@ import { ComparisonTable } from '@/components/ComparisonTable';
 import { ItineraryView } from '@/components/ItineraryView';
 import { WeatherCard } from '@/components/WeatherCard';
 import { BudgetEstimator } from '@/components/BudgetEstimator';
+import { MiniMap } from '@/components/MiniMap';
 import { useTripContext } from '@/context/TripContext';
 import { weatherService } from '@/services/weather.service';
 import { budgetService, TravelStyle } from '@/services/budget.service';
@@ -19,6 +19,10 @@ import styles from './TravelChat.module.css';
 const AlgoliaChat = lazy(() => 
   import('react-instantsearch').then(mod => ({ default: mod.Chat }))
 );
+
+const MemoizedAlgoliaChat = memo(function MemoizedAlgoliaChat(props: any) {
+  return <AlgoliaChat {...props} />;
+});
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -49,6 +53,9 @@ class ChatErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
 
 interface TravelChatProps {
   onCityClick?: (city: AlgoliaCity) => void;
+  onMapCitySelect?: (city: AlgoliaCity) => void;
+  pendingChatQuery?: string | null;
+  onClearPendingChatQuery?: () => void;
 }
 
 const SUGGESTED_QUERIES = [
@@ -56,6 +63,100 @@ const SUGGESTED_QUERIES = [
   'Beach vibes with nightlife',
   'Ancient culture and temples',
 ];
+
+const MAX_MAP_CITIES = 3;
+
+let lastSubmitTimestamp = 0;
+
+let seenBatchKeys = new Set<string>();
+let currentBatchKeys = new Set<string>();
+const pendingCitiesBuffer: AlgoliaCity[] = [];
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let latestBufferedCities: AlgoliaCity[] = [];
+let citiesVersion = 0;
+
+function cityKey(city: AlgoliaCity): string {
+  return (city.city || city.objectID).toLowerCase();
+}
+
+function bufferCity(city: AlgoliaCity) {
+  const key = cityKey(city);
+  if (seenBatchKeys.has(key)) return;
+
+  const isDuplicate = pendingCitiesBuffer.some((c) => cityKey(c) === key);
+  if (isDuplicate) return;
+
+  pendingCitiesBuffer.push(city);
+  if (flushTimer) clearTimeout(flushTimer);
+  flushTimer = setTimeout(() => {
+    const unique = pendingCitiesBuffer.slice(0, MAX_MAP_CITIES);
+    unique.forEach((c) => currentBatchKeys.add(cityKey(c)));
+    latestBufferedCities = unique;
+    citiesVersion++;
+    flushTimer = null;
+  }, 600);
+}
+
+function clearBuffer() {
+  const merged = new Set<string>();
+  seenBatchKeys.forEach((k) => merged.add(k));
+  currentBatchKeys.forEach((k) => merged.add(k));
+  seenBatchKeys = merged;
+  currentBatchKeys = new Set();
+  pendingCitiesBuffer.length = 0;
+  latestBufferedCities = [];
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+}
+
+function fullClearBuffer() {
+  seenBatchKeys = new Set();
+  currentBatchKeys = new Set();
+  pendingCitiesBuffer.length = 0;
+  latestBufferedCities = [];
+  citiesVersion = 0;
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+}
+
+function ChatCityCardInner({
+  city,
+  onCityClick,
+}: {
+  city: AlgoliaCity;
+  onCityClick?: (city: AlgoliaCity) => void;
+}) {
+  const { state, dispatch } = useTripContext();
+
+  useEffect(() => {
+    if (city?.objectID) {
+      bufferCity(city);
+    }
+  }, [city?.objectID]);
+
+  const key = cityKey(city);
+  if (seenBatchKeys.has(key)) {
+    return null;
+  }
+
+  return (
+    <CityCard
+      city={city}
+      onClick={onCityClick}
+      onMouseEnter={() =>
+        dispatch({ type: 'SET_HOVERED_CITY', payload: city.objectID })
+      }
+      onMouseLeave={() =>
+        dispatch({ type: 'SET_HOVERED_CITY', payload: null })
+      }
+      isHighlighted={state.hoveredCityId === city.objectID}
+    />
+  );
+}
 
 const UserAvatar = () => (
   <div className={styles.userAvatar}>
@@ -74,18 +175,30 @@ const HeaderIcon = () => (
 );
 
 
-export function TravelChat({ onCityClick }: TravelChatProps) {
+export function TravelChat({
+  onCityClick,
+  onMapCitySelect,
+  pendingChatQuery,
+  onClearPendingChatQuery,
+}: TravelChatProps) {
   const [agentId, setAgentId] = useState<string | null>(null);
   const [hasValidAgentId, setHasValidAgentId] = useState(false);
   const [fallbackResults, setFallbackResults] = useState<AlgoliaCity[]>([]);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
   const [showFallback, setShowFallback] = useState(false);
-  const [messagesContainer, setMessagesContainer] = useState<Element | null>(null);
   const [visibleResultsCount, setVisibleResultsCount] = useState(2);
   const [chatSessionKey, setChatSessionKey] = useState(() => Date.now().toString());
-  const enhancedContentRef = useRef<HTMLDivElement>(null);
   const { state, dispatch } = useTripContext();
+
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  const onCityClickRef = useRef(onCityClick);
+  onCityClickRef.current = onCityClick;
+
+  const onMapCitySelectRef = useRef(onMapCitySelect);
+  onMapCitySelectRef.current = onMapCitySelect;
 
   useEffect(() => {
     try {
@@ -99,48 +212,149 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   }, []);
 
   useEffect(() => {
-    const findMessagesContainer = () => {
-      const chatWidget = document.querySelector('[data-testid="chat-widget"]');
-      if (!chatWidget) return;
-      
-      const messagesEl = chatWidget.querySelector('[class*="algoliaChatMessages"]') 
-        || chatWidget.querySelector('[class*="ChatMessages"]')
-        || chatWidget.querySelector('[class*="messages"]');
-      
-      if (messagesEl) {
-        setMessagesContainer(messagesEl);
+    let lastVersion = 0;
+    const interval = setInterval(() => {
+      if (citiesVersion > lastVersion) {
+        lastVersion = citiesVersion;
+        if (latestBufferedCities.length > 0) {
+          dispatch({ type: 'SET_CHAT_RESULTS', payload: [...latestBufferedCities] });
+        }
       }
-    };
-
-    const timer = setTimeout(findMessagesContainer, 500);
-    const interval = setInterval(findMessagesContainer, 1000);
-    
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, [hasValidAgentId]);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [dispatch]);
 
   useEffect(() => {
     const chatWidget = document.querySelector('[data-testid="chat-widget"]');
     if (!chatWidget) return;
 
+    let dedupeTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const deduplicateMessages = () => {
+      const allMessages = chatWidget.querySelectorAll('article[data-role]');
+      const messages = Array.from(allMessages);
+
+      let groupAssistants: Element[] = [];
+
+      const processGroup = () => {
+        if (groupAssistants.length > 1) {
+          for (let j = 0; j < groupAssistants.length - 1; j++) {
+            groupAssistants[j].remove();
+          }
+        }
+      };
+
+      for (const msg of messages) {
+        const role = msg.getAttribute('data-role');
+        if (role === 'user') {
+          processGroup();
+          groupAssistants = [];
+        } else if (role === 'assistant') {
+          groupAssistants.push(msg);
+        }
+      }
+      processGroup();
+    };
+
+    const observer = new MutationObserver(() => {
+      if (dedupeTimer) clearTimeout(dedupeTimer);
+      dedupeTimer = setTimeout(deduplicateMessages, 3000);
+    });
+
+    observer.observe(chatWidget, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      if (dedupeTimer) clearTimeout(dedupeTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    let attachedForm: HTMLFormElement | null = null;
+
     const handleFormSubmit = (e: Event) => {
       const form = e.target as HTMLFormElement;
       const textarea = form.querySelector('textarea') as HTMLTextAreaElement;
       if (textarea && textarea.value.trim()) {
-        setLastQuery(textarea.value.trim());
-        setShowFallback(false);
-        setFallbackResults([]);
+        const now = Date.now();
+        if (now - lastSubmitTimestamp < 500) return;
+        lastSubmitTimestamp = now;
+        const value = textarea.value.trim();
+        setTimeout(() => {
+          setLastQuery(value);
+          setShowFallback(false);
+          setFallbackResults([]);
+          clearBuffer();
+          dispatch({ type: 'SET_CHAT_RESULTS', payload: [] });
+        }, 100);
       }
     };
 
-    const form = chatWidget.querySelector('form');
-    if (form) {
-      form.addEventListener('submit', handleFormSubmit);
-      return () => form.removeEventListener('submit', handleFormSubmit);
+    const tryAttach = () => {
+      if (attachedForm) return;
+      const chatWidget = document.querySelector('[data-testid="chat-widget"]');
+      if (!chatWidget) return;
+      const form = chatWidget.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+        attachedForm = form;
+        console.log('[Event] form submit handler attached');
+      }
+    };
+
+    tryAttach();
+    const interval = setInterval(tryAttach, 1000);
+
+    return () => {
+      clearInterval(interval);
+      if (attachedForm) {
+        attachedForm.removeEventListener('submit', handleFormSubmit);
+      }
+    };
+  }, [hasValidAgentId, dispatch]);
+
+  useEffect(() => {
+    if (!pendingChatQuery?.trim() || !onClearPendingChatQuery) return;
+    const chatWidget = document.querySelector('[data-testid="chat-widget"]');
+    if (!chatWidget) {
+      onClearPendingChatQuery();
+      return;
     }
-  }, [hasValidAgentId]);
+    const textarea = chatWidget.querySelector('textarea') as HTMLTextAreaElement;
+    if (!textarea) {
+      onClearPendingChatQuery();
+      return;
+    }
+    setLastQuery(pendingChatQuery.trim());
+    setShowFallback(false);
+    setFallbackResults([]);
+    clearBuffer();
+    dispatch({ type: 'SET_CHAT_RESULTS', payload: [] });
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      'value'
+    )?.set;
+    if (nativeInputValueSetter) {
+      nativeInputValueSetter.call(textarea, pendingChatQuery);
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    textarea.focus();
+    const submitAfter = () => {
+      const submitButton = chatWidget.querySelector(
+        'button[type="submit"]'
+      ) as HTMLButtonElement;
+      if (submitButton) {
+        submitButton.removeAttribute('disabled');
+        submitButton.click();
+      }
+      onClearPendingChatQuery();
+    };
+    const t = setTimeout(submitAfter, 100);
+    return () => clearTimeout(t);
+  }, [pendingChatQuery, onClearPendingChatQuery]);
 
   const performEnhancedSearch = useCallback(async (query: string) => {
     if (isEnhancing || !query.trim()) return;
@@ -154,12 +368,21 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         query: enhancement.originalQuery,
         expandedTerms: enhancement.expandedTerms,
         filters: enhancement.suggestedFilters,
-        hitsPerPage: 6,
+        hitsPerPage: 3,
       });
       
       if (searchResult.hits.length > 0) {
-        setFallbackResults(searchResult.hits);
+        const uniqueHits = searchResult.hits.filter(
+          (city, idx, self) =>
+            self.findIndex(
+              (c) =>
+                c.objectID === city.objectID ||
+                c.city.toLowerCase() === city.city.toLowerCase()
+            ) === idx
+        );
+        setFallbackResults(uniqueHits);
         setShowFallback(true);
+        dispatch({ type: 'SET_CHAT_RESULTS', payload: uniqueHits.slice(0, 3) });
       }
     } catch (error) {
       console.error('Enhanced search failed:', error);
@@ -169,10 +392,8 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   }, [isEnhancing]);
 
   const handleCityClick = useCallback((city: AlgoliaCity) => {
-    if (onCityClick) {
-      onCityClick(city);
-    }
-  }, [onCityClick]);
+    onCityClickRef.current?.(city);
+  }, []);
 
   const setReactInputValue = useCallback((input: HTMLTextAreaElement, value: string) => {
     const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
@@ -191,6 +412,8 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     setLastQuery(query);
     setShowFallback(false);
     setFallbackResults([]);
+    clearBuffer();
+    dispatch({ type: 'SET_CHAT_RESULTS', payload: [] });
     
     const chatWidget = document.querySelector('[data-testid="chat-widget"]');
     if (!chatWidget) return;
@@ -212,7 +435,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         }
       }, 50);
     }, 50);
-  }, [setReactInputValue]);
+  }, [setReactInputValue, dispatch]);
 
   const handleManualEnhancedSearch = useCallback(() => {
     if (lastQuery) {
@@ -238,11 +461,20 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     return fetchCityById(id);
   }, []);
 
-  const CityCardItem = useCallback(({ item }: { item: Record<string, unknown> }) => (
-    <CityCard city={item as unknown as AlgoliaCity} onClick={handleCityClick} />
-  ), [handleCityClick]);
+  const CityCardItem = useCallback(
+    ({ item }: { item: Record<string, unknown> }) => {
+      const city = item as unknown as AlgoliaCity;
+      return (
+        <ChatCityCardInner
+          city={city}
+          onCityClick={handleCityClick}
+        />
+      );
+    },
+    [handleCityClick]
+  );
 
-  const tools = {
+  const tools = useMemo(() => ({
     save_preference: {
       onToolCall: ({ addToolResult, ...rest }: any) => {
         const input = rest.input as { category: string; value: string; priority: string | null } | undefined;
@@ -286,6 +518,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
                   isActive: true,
                 },
               });
+              dispatch({ type: 'SET_CHAT_RESULTS', payload: cities.slice(0, 3) });
               addToolResult({
                 output: {
                   comparisonData: cities,
@@ -310,18 +543,22 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         if (!message.output?.comparisonData?.length) {
           return <div className={styles.toolLoading}>Loading comparison...</div>;
         }
+        const cities = message.output.comparisonData as AlgoliaCity[];
         return (
-          <ComparisonTable
-            cities={message.output.comparisonData}
-            recommendation={message.output.comparison?.recommendation}
-            onSelect={(city: AlgoliaCity) => {
-              dispatch({
-                type: 'ADD_TO_TRIP',
-                payload: { city, durationDays: null, notes: null },
-              });
-            }}
-            onClose={() => dispatch({ type: 'CLEAR_COMPARISON' })}
-          />
+          <div className={styles.compareWithMap}>
+            <MiniMap cities={cities} onMarkerClick={(city: AlgoliaCity) => onMapCitySelectRef.current?.(city)} />
+            <ComparisonTable
+              cities={cities}
+              recommendation={message.output.comparison?.recommendation}
+              onSelect={(city: AlgoliaCity) => {
+                dispatch({
+                  type: 'ADD_TO_TRIP',
+                  payload: { city, durationDays: null, notes: null },
+                });
+              }}
+              onClose={() => dispatch({ type: 'CLEAR_COMPARISON' })}
+            />
+          </div>
         );
       },
     },
@@ -411,9 +648,10 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
       onToolCall: ({ addToolResult, ...rest }: any) => {
         const input = rest.input as { category: string | null } | undefined;
         const isAll = !input?.category || input.category === 'all';
+        const currentPrefs = stateRef.current.preferences;
         const clearedCount = isAll
-          ? state.preferences.length
-          : state.preferences.filter((p) => p.category === input?.category).length;
+          ? currentPrefs.length
+          : currentPrefs.filter((p) => p.category === input?.category).length;
         
         dispatch({
           type: 'CLEAR_PREFERENCES',
@@ -626,7 +864,33 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         );
       },
     },
-  } as any;
+    get_map_bounds: {
+      onToolCall: ({ addToolResult }: any) => {
+        const bounds = stateRef.current.mapBounds;
+        if (!bounds) {
+          addToolResult({
+            output: {
+              hasBounds: false,
+              message:
+                'User has not panned or zoomed the map yet. Recommend any region.',
+            },
+          });
+          return;
+        }
+        addToolResult({
+          output: {
+            hasBounds: true,
+            north: bounds.north,
+            south: bounds.south,
+            east: bounds.east,
+            west: bounds.west,
+            message: `User is viewing map region: latitude ${bounds.south.toFixed(2)} to ${bounds.north.toFixed(2)}, longitude ${bounds.west.toFixed(2)} to ${bounds.east.toFixed(2)}. Prefer recommending destinations within or near this region.`,
+          },
+        });
+      },
+      layoutComponent: () => null,
+    },
+  } as any), [dispatch, fetchCity, fetchCities]);
 
   const PlaceholderContent = (
     <div className={styles.placeholder}>
@@ -647,7 +911,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     </div>
   );
 
-  const chatClassNames = {
+  const chatClassNames = useMemo(() => ({
     root: styles.algoliaChat,
     container: styles.algoliaChatContainer,
     header: {
@@ -667,7 +931,17 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
       submit: styles.algoliaChatSubmit,
       footer: styles.algoliaChatPromptFooter,
     },
-  };
+  }), []);
+
+  const memoizedTranslations = useMemo(() => ({
+    header: {
+      title: 'Vibe Assistant',
+    },
+    prompt: {
+      textareaPlaceholder: 'Describe your ideal travel vibe...',
+      disclaimer: 'Your preferences are remembered during this session.',
+    },
+  }), []);
 
   const renderChatContent = () => {
     if (!hasValidAgentId || !agentId) {
@@ -677,7 +951,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     return (
       <ChatErrorBoundary fallback={PlaceholderContent}>
         <Suspense fallback={LoadingContent}>
-          <AlgoliaChat
+          <MemoizedAlgoliaChat
             key={chatSessionKey}
             agentId={agentId}
             itemComponent={CityCardItem}
@@ -686,15 +960,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
             userMessageLeadingComponent={UserAvatar}
             assistantMessageLeadingComponent={AssistantAvatar}
             headerTitleIconComponent={HeaderIcon}
-            translations={{
-              header: {
-                title: 'Vibe Assistant',
-              },
-              prompt: {
-                textareaPlaceholder: 'Describe your ideal travel vibe...',
-                disclaimer: 'Your preferences are remembered during this session.',
-              },
-            }}
+            translations={memoizedTranslations}
           />
         </Suspense>
       </ChatErrorBoundary>
@@ -702,6 +968,7 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
   };
 
   const handleClearConversation = useCallback(async () => {
+    fullClearBuffer();
     dispatch({ type: 'RESET_ALL' });
     
     setFallbackResults([]);
@@ -709,7 +976,6 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
     setShowFallback(false);
     setIsEnhancing(false);
     setVisibleResultsCount(2);
-    setMessagesContainer(null);
     
     try {
       const keysToRemove: string[] = [];
@@ -762,96 +1028,113 @@ export function TravelChat({ onCityClick }: TravelChatProps) {
         className={styles.chatWidget} 
         data-testid="chat-widget"
         data-agent-id={agentId || undefined}
-        onKeyDown={(e) => {
+        onKeyDownCapture={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
-            const textarea = e.target as HTMLTextAreaElement;
-            if (textarea.tagName === 'TEXTAREA' && textarea.value.trim()) {
-              setLastQuery(textarea.value.trim());
-              setShowFallback(false);
-              setFallbackResults([]);
+            const directTarget = e.target as HTMLElement;
+            if (directTarget.tagName === 'TEXTAREA') {
+              const value = (directTarget as HTMLTextAreaElement).value.trim();
+              if (value) {
+                const now = Date.now();
+                if (now - lastSubmitTimestamp < 500) return;
+                lastSubmitTimestamp = now;
+                setTimeout(() => {
+                  setLastQuery(value);
+                  setShowFallback(false);
+                  setFallbackResults([]);
+                  clearBuffer();
+                  dispatch({ type: 'SET_CHAT_RESULTS', payload: [] });
+                }, 100);
+              }
             }
           }
         }}
       >
         {renderChatContent()}
-        
-        {messagesContainer && createPortal(
-          <div ref={enhancedContentRef} className={styles.enhancedSearchPortal}>
-            {lastQuery && !showFallback && !isEnhancing && (
-              <div className={styles.inChatMessage}>
-                <div className={styles.messageAvatar}>✨</div>
-                <div className={styles.inChatAction}>
-                  <p className={styles.inChatPrompt}>
-                    Didn&apos;t find what you were looking for? Try an enhanced search.
-                  </p>
-                  <button
-                    onClick={handleManualEnhancedSearch}
-                    className={styles.inChatEnhancedButton}
-                    type="button"
-                  >
-                    Try Enhanced Search
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {isEnhancing && (
-              <div className={styles.inChatMessage}>
-                <div className={styles.messageAvatar}>✨</div>
-                <div className={styles.inChatLoading}>
-                  <span className={styles.loadingSpinner}></span>
-                  Searching with enhanced query...
-                </div>
-              </div>
-            )}
-
-            {showFallback && fallbackResults.length > 0 && (() => {
-              const uniqueResults = fallbackResults.filter(
-                (city, index, self) => self.findIndex(c => c.objectID === city.objectID) === index
-              );
-              const visibleResults = uniqueResults.slice(0, visibleResultsCount);
-              const hasMoreResults = uniqueResults.length > visibleResultsCount;
-              
-              return (
-                <div className={styles.inChatMessage} data-testid="fallback-results">
-                  <div className={styles.messageAvatar}>✨</div>
-                  <div className={styles.inChatResults}>
-                    <div className={styles.inChatResultsHeader}>
-                      <span>Enhanced Search Results</span>
-                      <button
-                        onClick={handleDismissFallback}
-                        className={styles.inChatDismiss}
-                        aria-label="Dismiss enhanced results"
-                        type="button"
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <p className={styles.inChatResultsDescription}>
-                      Based on your query, here are some destinations that might match:
-                    </p>
-                    <div className={styles.inChatResultsGrid}>
-                      {visibleResults.map((city) => (
-                        <CityCard key={city.objectID} city={city} onClick={handleCityClick} />
-                      ))}
-                    </div>
-                    {hasMoreResults && (
-                      <button
-                        onClick={handleShowMoreResults}
-                        className={styles.showMoreButton}
-                        type="button"
-                      >
-                        Show more results
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })()}
-          </div>,
-          messagesContainer
-        )}
       </div>
+
+      {lastQuery && !showFallback && !isEnhancing && (
+        <div className={styles.enhancedSearchSection}>
+          <p className={styles.enhancedSearchPrompt}>
+            Didn&apos;t find what you were looking for?
+          </p>
+          <button
+            onClick={handleManualEnhancedSearch}
+            className={styles.enhancedSearchButton}
+            type="button"
+          >
+            Try Enhanced Search
+          </button>
+        </div>
+      )}
+
+      {isEnhancing && (
+        <div className={styles.enhancedSearchSection}>
+          <div className={styles.enhancingIndicator}>
+            <span className={styles.loadingSpinner}></span>
+            Searching with enhanced query...
+          </div>
+        </div>
+      )}
+
+      {showFallback && fallbackResults.length > 0 && (() => {
+        const uniqueResults = fallbackResults.filter(
+          (city, index, self) => self.findIndex(c => c.objectID === city.objectID) === index
+        );
+        const visibleResults = uniqueResults.slice(0, visibleResultsCount);
+        const hasMoreResults = uniqueResults.length > visibleResultsCount;
+        
+        return (
+          <div className={styles.enhancedResultsSection} data-testid="fallback-results">
+            <div className={styles.enhancedResultsHeader}>
+              <span className={styles.enhancedResultsTitle}>Enhanced Search Results</span>
+              <button
+                onClick={handleDismissFallback}
+                className={styles.enhancedResultsDismiss}
+                aria-label="Dismiss enhanced results"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+            <p className={styles.enhancedResultsDescription}>
+              Based on your query, here are some destinations that might match:
+            </p>
+            {visibleResults.length > 0 && (
+              <div className={styles.miniMapWrap}>
+                <MiniMap
+                  cities={visibleResults}
+                  onMarkerClick={onMapCitySelect}
+                />
+              </div>
+            )}
+            <div className={styles.enhancedResultsGrid}>
+              {visibleResults.map((city) => (
+                <CityCard
+                  key={city.objectID}
+                  city={city}
+                  onClick={handleCityClick}
+                  onMouseEnter={() =>
+                    dispatch({ type: 'SET_HOVERED_CITY', payload: city.objectID })
+                  }
+                  onMouseLeave={() =>
+                    dispatch({ type: 'SET_HOVERED_CITY', payload: null })
+                  }
+                  isHighlighted={state.hoveredCityId === city.objectID}
+                />
+              ))}
+            </div>
+            {hasMoreResults && (
+              <button
+                onClick={handleShowMoreResults}
+                className={styles.showMoreButton}
+                type="button"
+              >
+                Show more results
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       <div className={styles.suggestedQueries}>
         <p className={styles.suggestedTitle}>Try asking:</p>

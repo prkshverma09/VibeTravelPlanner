@@ -94,14 +94,13 @@ describe('TravelChat buffer mechanism - no dispatch during streaming', () => {
     expect(content).toContain('onMapCitySelectRef.current');
   });
 
-  it('should NOT have CSS display:none hacks for Algolia Chat elements', async () => {
+  it('should NOT have CSS hacks that hide duplicate messages (hiding carousel chrome is OK)', async () => {
     const fs = await import('fs');
     const path = await import('path');
     const cssPath = path.resolve(__dirname, '../TravelChat.module.css');
     const content = fs.readFileSync(cssPath, 'utf8');
 
     expect(content).not.toContain('ais-ChatMessage-tool');
-    expect(content).not.toContain('ais-ChatToolSearchIndexCarouselHeaderCount');
     expect(content).not.toContain('ais-ChatMessage:has(~');
   });
 

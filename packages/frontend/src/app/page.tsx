@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { InstantSearchProvider } from '@/providers';
 import { TravelChat } from '@/components/TravelChat';
 import { CityCard } from '@/components/CityCard';
 import { DestinationMap } from '@/components/DestinationMap';
+import { useTripContext } from '@/context/TripContext';
 import { mockCities } from '@vibe-travel/shared';
 import type { AlgoliaCity } from '@vibe-travel/shared';
 
@@ -13,7 +14,40 @@ const featuredCities = mockCities.slice(0, 3);
 
 export default function HomePage() {
   const router = useRouter();
+  const { state } = useTripContext();
   const [selectedCity, setSelectedCity] = useState<AlgoliaCity | null>(null);
+  const [pendingChatQuery, setPendingChatQuery] = useState<string | null>(null);
+
+  const mapDestinations = useMemo(() => {
+    if (state.chatResults.length === 0) return mockCities;
+
+    const mockCityMap = new Map(mockCities.map(c => [c.objectID, c]));
+    const mockCityNameMap = new Map(mockCities.map(c => [c.city.toLowerCase(), c]));
+    const seen = new Set<string>();
+
+    const enriched: AlgoliaCity[] = [];
+    for (const chatCity of state.chatResults) {
+      const key = (chatCity.city || chatCity.objectID).toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      if (chatCity._geoloc?.lat != null && chatCity._geoloc?.lng != null) {
+        enriched.push(chatCity);
+        continue;
+      }
+      const byId = mockCityMap.get(chatCity.objectID);
+      if (byId?._geoloc) {
+        enriched.push({ ...chatCity, _geoloc: byId._geoloc });
+        continue;
+      }
+      const byName = mockCityNameMap.get((chatCity.city || '').toLowerCase());
+      if (byName?._geoloc) {
+        enriched.push({ ...chatCity, _geoloc: byName._geoloc });
+      }
+    }
+
+    return enriched.length > 0 ? enriched : mockCities;
+  }, [state.chatResults]);
 
   const handleCityClick = (city: AlgoliaCity) => {
     router.push(`/city/${city.objectID}`);
@@ -21,6 +55,10 @@ export default function HomePage() {
 
   const handleCitySelect = (city: AlgoliaCity) => {
     setSelectedCity(city);
+  };
+
+  const handleAskInChat = (query: string) => {
+    setPendingChatQuery(query);
   };
 
   return (
@@ -40,14 +78,20 @@ export default function HomePage() {
           <InstantSearchProvider>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div data-testid="chat-panel">
-                <TravelChat onCityClick={handleCityClick} />
+                <TravelChat
+                  onCityClick={handleCityClick}
+                  onMapCitySelect={handleCitySelect}
+                  pendingChatQuery={pendingChatQuery}
+                  onClearPendingChatQuery={() => setPendingChatQuery(null)}
+                />
               </div>
               <div className="h-[600px] lg:h-auto min-h-[500px]">
                 <DestinationMap
-                  destinations={mockCities}
+                  destinations={mapDestinations}
                   selectedCity={selectedCity}
                   onCitySelect={handleCitySelect}
                   onCityClick={handleCityClick}
+                  onAskInChat={handleAskInChat}
                 />
               </div>
             </div>

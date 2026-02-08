@@ -482,7 +482,7 @@ export function getDayTheme(city: CityData, dayNumber: number, interests: string
   const cityCategories = getCityTopCategories(city);
   const categories = interests.length > 0 ? [...interests, ...cityCategories] : cityCategories;
 
-  const uniqueCategories = [...new Set(categories)];
+  const uniqueCategories = Array.from(new Set(categories));
   const categoryIndex = (dayNumber - 1) % uniqueCategories.length;
   const category = uniqueCategories[categoryIndex];
 

@@ -13,6 +13,7 @@ interface MapPopupProps {
   onClose: () => void;
   onViewDetails?: () => void;
   onAddToItinerary?: () => void;
+  onAskInChat?: (query: string) => void;
   isInItinerary?: boolean;
 }
 
@@ -21,6 +22,7 @@ export function MapPopup({
   onClose,
   onViewDetails,
   onAddToItinerary,
+  onAskInChat,
   isInItinerary
 }: MapPopupProps) {
   if (!city._geoloc) return null;
@@ -82,6 +84,19 @@ export function MapPopup({
             >
               View Details
             </button>
+            {onAskInChat && (
+              <button
+                className={styles.chatButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAskInChat(`Tell me more about ${city.city}, ${city.country}`);
+                }}
+                type="button"
+                data-testid="popup-ask-in-chat"
+              >
+                Ask in Chat
+              </button>
+            )}
             {onAddToItinerary && (
               <button
                 className={`${styles.itineraryButton} ${isInItinerary ? styles.inItinerary : ''}`}

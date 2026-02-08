@@ -58,6 +58,30 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
+.hovered .pin {
+  animation: markerPulse 1s ease-in-out infinite;
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.3);
+}
+
+.dimmed {
+  opacity: 0.3;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+.dimmed:hover {
+  opacity: 0.7;
+}
+
+@keyframes markerPulse {
+  0%, 100% {
+    transform: rotate(-45deg) scale(1);
+  }
+  50% {
+    transform: rotate(-45deg) scale(1.15);
+  }
+}
+
 .label {
   margin-top: 4px;
   background: white;
