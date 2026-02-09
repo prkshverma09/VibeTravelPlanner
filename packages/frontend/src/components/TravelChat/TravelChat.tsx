@@ -16,6 +16,8 @@ import { queryEnhancementService } from '@/services/query-enhancement.service';
 import type { AlgoliaCity } from '@vibe-travel/shared';
 import styles from './TravelChat.module.css';
 
+import { SearchIndexToolType, createDefaultTools } from 'react-instantsearch';
+
 const AlgoliaChat = lazy(() => 
   import('react-instantsearch').then(mod => ({ default: mod.Chat }))
 );
@@ -68,6 +70,8 @@ const MAX_MAP_CITIES = 3;
 
 let lastSubmitTimestamp = 0;
 
+let hasRenderedSearchResultsForCurrentTurn = false;
+
 let seenBatchKeys = new Set<string>();
 let currentBatchKeys = new Set<string>();
 const pendingCitiesBuffer: AlgoliaCity[] = [];
@@ -105,6 +109,7 @@ function clearBuffer() {
   currentBatchKeys = new Set();
   pendingCitiesBuffer.length = 0;
   latestBufferedCities = [];
+  hasRenderedSearchResultsForCurrentTurn = false;
   if (flushTimer) {
     clearTimeout(flushTimer);
     flushTimer = null;
@@ -117,6 +122,7 @@ function fullClearBuffer() {
   pendingCitiesBuffer.length = 0;
   latestBufferedCities = [];
   citiesVersion = 0;
+  hasRenderedSearchResultsForCurrentTurn = false;
   if (flushTimer) {
     clearTimeout(flushTimer);
     flushTimer = null;
@@ -317,6 +323,11 @@ export function TravelChat({
   }, [hasValidAgentId, dispatch]);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') (window as any).__clearChatBuffer = clearBuffer;
+    return () => { if (typeof window !== 'undefined') delete (window as any).__clearChatBuffer; };
+  }, []);
+
+  useEffect(() => {
     if (!pendingChatQuery?.trim() || !onClearPendingChatQuery) return;
     const chatWidget = document.querySelector('[data-testid="chat-widget"]');
     if (!chatWidget) {
@@ -474,7 +485,68 @@ export function TravelChat({
     [handleCityClick]
   );
 
-  const tools = useMemo(() => ({
+  const tools = useMemo(() => {
+    const defaultTools = createDefaultTools(CityCardItem, undefined);
+    const defaultSearchTool = defaultTools[SearchIndexToolType];
+    const customLayoutComponent = ({ message, ...rest }: any) => {
+      let outputOrResult = message?.output ?? message?.result;
+      if (typeof outputOrResult === 'string') {
+        try {
+          outputOrResult = JSON.parse(outputOrResult) as Record<string, unknown>;
+        } catch {
+          outputOrResult = undefined;
+        }
+      }
+      const rawHits =
+        (Array.isArray((outputOrResult as any)?.hits) ? (outputOrResult as any).hits : null) ||
+        (Array.isArray((outputOrResult as any)?.results?.[0]?.hits) ? (outputOrResult as any).results[0].hits : null) ||
+        (Array.isArray((outputOrResult as any)?.data?.hits) ? (outputOrResult as any).data.hits : null) ||
+        [];
+      const hits = Array.isArray(rawHits) ? (rawHits as AlgoliaCity[]) : [];
+
+      if (hits.length === 0) return defaultSearchTool?.layoutComponent ? defaultSearchTool.layoutComponent({ message, ...rest }) : null;
+
+      const unique = hits.filter(
+        (city, i, self) =>
+          self.findIndex(
+            (c) => c.city?.toLowerCase() === city.city?.toLowerCase()
+          ) === i
+      ).slice(0, 2);
+
+      if (unique.length > 0) {
+        hasRenderedSearchResultsForCurrentTurn = true;
+        unique.forEach((city) => bufferCity(city));
+        return (
+          <div className={styles.chatCarouselGrid} data-testid="chat-carousel-grid">
+            {unique.map((city) => (
+              <ChatCityCardInner
+                key={city.objectID}
+                city={city}
+                onCityClick={(c) => onCityClickRef.current?.(c)}
+              />
+            ))}
+          </div>
+        );
+      }
+
+      if (defaultSearchTool?.layoutComponent) {
+        return defaultSearchTool.layoutComponent({ message, ...rest });
+      }
+      return null;
+    };
+    const resultLayoutComponent = (props: any) => {
+      if (props.message?.toolName === SearchIndexToolType) return customLayoutComponent(props);
+      return null;
+    };
+    return {
+    [SearchIndexToolType]: {
+      ...defaultSearchTool,
+      layoutComponent: customLayoutComponent,
+    },
+    result: {
+      ...defaultSearchTool,
+      layoutComponent: resultLayoutComponent,
+    },
     save_preference: {
       onToolCall: ({ addToolResult, ...rest }: any) => {
         const input = rest.input as { category: string; value: string; priority: string | null } | undefined;
@@ -890,7 +962,8 @@ export function TravelChat({
       },
       layoutComponent: () => null,
     },
-  } as any), [dispatch, fetchCity, fetchCities]);
+  } as any;
+  }, [dispatch, fetchCity, fetchCities, CityCardItem]);
 
   const PlaceholderContent = (
     <div className={styles.placeholder}>

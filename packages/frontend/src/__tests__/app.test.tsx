@@ -8,6 +8,8 @@ vi.mock('react-instantsearch', () => ({
   InstantSearch: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="instantsearch">{children}</div>
   ),
+  Chat: () => null,
+  SearchIndexToolType: 'algolia_search_index',
 }));
 
 vi.mock('search-insights', () => ({

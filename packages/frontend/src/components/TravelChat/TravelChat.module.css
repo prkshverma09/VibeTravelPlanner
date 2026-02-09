@@ -144,9 +144,17 @@
   @apply bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm font-medium my-2;
 }
 
-/* Hide the Algolia Chat carousel header (result count, "View all", scroll arrows) */
-.chatWidget :global(.ais-ChatToolSearchIndexCarouselHeader) {
-  display: none !important;
+.chatCarouselGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 8px 0;
+}
+
+@media (max-width: 480px) {
+  .chatCarouselGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Enhanced Search Section - rendered below the chat widget */

@@ -23,6 +23,18 @@ Use this guide to manually verify that the map and chat UIs work together as int
 
 **Pass:** Map destinations change when chat returns new city results and the view fits those cities.
 
+**1b – At most 2 destination cards, no duplicates**
+
+| Step | Action | Expected result |
+|------|--------|------------------|
+| 1 | Open the app and go to the home page. | Chat panel and map visible. |
+| 2 | In the chat, send: "Romantic European city". | Assistant replies; may show city cards. |
+| 3 | Send a second message: "a city with warm weather, cultural landmarks, or scenic views". | Assistant replies again. |
+| 4 | In the assistant reply(ies), count the destination cards (city cards with name/description). | There are at most 2 destination cards in total for that turn. |
+| 5 | Check the city names on those cards. | No duplicate city names (e.g. Lisbon must not appear twice). |
+
+**Pass:** Each assistant turn shows at most 2 unique destination cards (no duplicates).
+
 ---
 
 ## Scenario 2: Map click → “Ask in Chat”

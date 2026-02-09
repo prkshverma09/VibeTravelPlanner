@@ -20,6 +20,7 @@ vi.mock('@/components/CityCard', () => ({
 
 vi.mock('react-instantsearch', () => ({
   Chat: (props: any) => <div data-testid="algolia-chat-mock" {...props} />,
+  SearchIndexToolType: 'algolia_search_index',
 }));
 
 const TestWrapper = ({ children }: { children: ReactNode }) => (
@@ -140,6 +141,22 @@ describe('TravelChat buffer mechanism - no dispatch during streaming', () => {
     expect(content).toContain('.remove()');
     expect(content).toContain('observer.observe');
     expect(content).toContain('observer.disconnect');
+  });
+
+  it('should override SearchIndexToolType with custom layoutComponent for deduplicated city cards', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const filePath = path.resolve(__dirname, '../TravelChat.tsx');
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    expect(content).toContain("import { SearchIndexToolType } from 'react-instantsearch'");
+    expect(content).toContain('[SearchIndexToolType]:');
+    expect(content).toContain('layoutComponent');
+    expect(content).toContain('styles.chatCarouselGrid');
+    expect(content).toContain('message?.output?.hits');
+    expect(content).toContain('bufferCity(city)');
+    expect(content).toContain('slice(0, 2)');
+    expect(content).toContain('hasRenderedSearchResultsForCurrentTurn');
   });
 });
 
