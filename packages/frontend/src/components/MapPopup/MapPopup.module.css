@@ -85,6 +85,7 @@
   cursor: pointer;
   transition: opacity 0.2s;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .viewButton:hover {
@@ -92,7 +93,8 @@
 }
 
 .chatButton {
-  padding: 8px 12px;
+  flex: 1;
+  padding: 8px 16px;
   background: #f3e8ff;
   color: #6d28d9;
   border: 1px solid #c4b5fd;
@@ -101,33 +103,9 @@
   cursor: pointer;
   transition: all 0.2s;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .chatButton:hover {
   background: #ede9fe;
-}
-
-.itineraryButton {
-  padding: 8px 12px;
-  background: #f0f0f0;
-  color: #333;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-}
-
-.itineraryButton:hover {
-  background: #e0e0e0;
-}
-
-.itineraryButton.inItinerary {
-  background: #ffebee;
-  color: #d32f2f;
-}
-
-.itineraryButton.inItinerary:hover {
-  background: #ffcdd2;
 }

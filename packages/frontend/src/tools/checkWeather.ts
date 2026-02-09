@@ -24,7 +24,7 @@ export function createCheckWeatherHandler(
     onToolCall: async ({ input, addToolResult }) => {
       try {
         const weather = await getWeather(input.city_name, input.country || undefined);
-        
+
         if (weather) {
           addToolResult({
             output: { weather },

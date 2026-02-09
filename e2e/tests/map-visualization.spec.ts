@@ -78,26 +78,6 @@ test.describe('Map Visualization', () => {
     await expect(adventureLabel).toBeVisible();
   });
 
-  test('should add city to itinerary from popup', async ({ page }) => {
-    await page.waitForTimeout(2000);
-
-    const markers = page.locator('[data-testid="map-marker"]');
-    const markerCount = await markers.count();
-    
-    if (markerCount > 0) {
-      await markers.first().click();
-
-      const addButton = page.locator('[data-testid="popup-add-itinerary"]');
-      await expect(addButton).toBeVisible({ timeout: 5000 });
-      
-      await expect(addButton).toContainText('Add');
-      
-      await addButton.click();
-
-      await expect(addButton).toContainText('Remove');
-    }
-  });
-
   test('should be responsive on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
 

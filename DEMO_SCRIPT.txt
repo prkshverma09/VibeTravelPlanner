@@ -1,0 +1,65 @@
+Hey everyone. This is Vibe Travel Planner — an AI-powered travel discovery app built for the Algolia Agent Studio Challenge.
+
+The core idea is what I call "aesthetic-first discovery." Instead of clicking through traditional filters like continent or budget, you describe the atmosphere you're looking for — "moody architecture and quiet coffee shops" or "neon-lit nightlife and street food" — and the AI translates that into structured Algolia queries to find destinations that match the vibe.
+
+Let me walk you through it. <break time="1.5s" />
+
+Here's the home page. It's a split-view layout. <break time="1.0s" />
+
+On the left is the Vibe Assistant — a conversational chat powered by Algolia Agent Studio using the react-instantsearch Chat widget. The welcome message says "Hi! I'm your travel concierge. Tell me about your ideal vacation vibe, and I'll help you find the perfect destination." Below the input there are suggestion chips — "Romantic European city," "Beach vibes with nightlife," and "Ancient culture and temples" — for quick one-click queries.
+
+On the right is an interactive Mapbox map showing destination markers around the world. When markers are close together, they cluster automatically. You can click any marker to see a popup with the city image, vibe tags, scores, and action buttons. <break time="1.0s" />
+
+Scroll down and you'll see Featured Destination cards — each with an image, vibe tags like "romantic" or "bohemian," culture and nightlife scores, a short description, and a heart icon to add to your wishlist.
+
+The entire page is wrapped in an InstantSearch provider with Algolia Insights enabled, which tracks search events and clicks for NeuralSearch training. <break time="1.5s" />
+
+Let me click the "Romantic European city" chip. It drops into the chat and sends immediately. <break time="2.0s" />
+
+Behind the scenes, the agent extracts vibe keywords — "romantic" maps to related terms like "honeymoon," "couples," and "intimate" through twenty-two synonym sets I've configured in the Algolia index. It searches the travel destinations index, which has cities with rich attributes — five category scores from one to ten for culture, adventure, nature, beach, and nightlife, plus LLM-generated descriptions and semantic vibe tags. <break time="1.0s" />
+
+Results come back almost instantly. City cards appear right in the conversation — each showing the city name, country, a description, vibe tags, and scores. These are interactive — I can click any card to navigate to a full detail page. <break time="1.0s" />
+
+Look at the map — it's updated to show only the recommended cities and zoomed to fit them. That real-time sync happens through a buffering system that deduplicates cities and pushes them to the map via shared React context. At most two destination cards appear per turn, and no city repeats across turns. <break time="1.0s" />
+
+I can hover over a card in the chat and the matching marker on the map pulses with a highlight. <break time="1.5s" />
+
+I can also type a follow-up like "something cheaper, with good food" — the agent keeps conversation context and refines the results. <break time="2.0s" />
+
+Now let me interact with the map directly. I'll click a marker. <break time="1.5s" />
+
+A popup opens showing the city image, vibe tags, culture and adventure scores, and three action buttons — "View Details," "Ask in Chat," and "Add." <break time="1.0s" />
+
+If I click "Ask in Chat," it fills the chat input with "Tell me more about" the city and sends it automatically. <break time="2.0s" />
+
+The agent responds with detailed context about that destination. The map is a way to steer the conversation — not just a display. <break time="1.5s" />
+
+Next, budget. I'll ask how much a seven day trip would cost. <break time="2.0s" />
+
+The agent triggers the estimate budget tool, pulls the city's average cost per day from the Algolia index, and calculates a full breakdown — accommodation, food, activities, transport, miscellaneous — across budget, moderate, and luxury tiers.
+
+A budget card renders inline with clear numbers and a total. The data driving this comes directly from the enriched city records in the Algolia index. <break time="1.5s" />
+
+Let me click a city card to see the full detail page. <break time="1.5s" />
+
+Hero image at the top with the city and country name overlaid. Below that, the About section with a vivid description — these descriptions are LLM-generated through the data pipeline, designed to capture the city's unique atmosphere and mood. <break time="1.0s" />
+
+Then the vibe tags section, and the full ratings — culture, adventure, nature, beach, nightlife — color-coded green for high scores, yellow for medium, red for low. <break time="1.0s" />
+
+At the bottom is a call-to-action: "Ready to explore?" with a Plan Trip button. Clicking it opens a multi-step wizard — pick your dates, set number of travelers, choose your trip style including budget level, pace, and interests, review everything, and submit. At the end of the wizard, you get an itinerary showing the estimated cost and complete plan for your trip. <break time="2.0s" />
+
+Now let me show you how it all fits together under the hood. <break time="1.0s" />
+
+At the top, the user describes a vibe in natural language. That goes to Algolia Agent Studio, which has the travel concierge system prompt, the search index, and twenty-two synonym sets for query expansion — "romantic" maps to "honeymoon, couples, love, anniversary." <break time="0.5s" />
+
+The agent queries the Algolia travel destinations index — two hundred plus cities, each with LLM-enriched descriptions, five category scores, vibe tags, geolocation, and cost data. <break time="0.5s" />
+
+Results flow back to the frontend, where the Chat Panel and Interactive Map stay in sync through shared React context. <break time="1.5s" />
+
+And here are the nine client-side tools the agent can trigger. Search for vibe-based discovery. Compare Cities for side-by-side scores. Check Weather for forecasts. Estimate Budget for cost breakdowns. Generate Itinerary for day-by-day plans. Plus Wishlist, Trip Plan, Preferences, and Map Bounds for context-aware recommendations. <break time="1.0s" />
+
+Each tool renders as a rich UI component — comparison tables, weather cards, budget estimators — all inline in the conversation. <break time="1.5s" />
+
+That's Vibe Travel Planner — describe the vibe you want, and the AI concierge finds your next destination, compares options, checks the weather, estimates the budget, and plans the trip. All in one conversation.
+
+Thanks for watching.

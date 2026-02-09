@@ -17,14 +17,14 @@ const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1488646953014-85cb4
 
 function truncateDescription(text: string, maxLength: number = 150): string {
   if (text.length <= maxLength) return text;
-  
+
   const truncated = text.substring(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
-  
+
   if (lastSpace > maxLength * 0.8) {
     return truncated.substring(0, lastSpace) + '...';
   }
-  
+
   return truncated + '...';
 }
 
@@ -86,7 +86,7 @@ export function CityCard({
           }}
         />
         {showWishlistButton && (
-          <div 
+          <div
             className="absolute top-2 right-2 z-10"
             onClick={handleWishlistClick}
           >
@@ -112,7 +112,7 @@ export function CityCard({
           ))}
         </div>
 
-        <p 
+        <p
           className="text-sm text-gray-600 mb-4 line-clamp-3"
           data-testid="city-description"
         >

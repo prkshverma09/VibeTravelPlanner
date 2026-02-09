@@ -113,9 +113,9 @@ describe('Client-Side Tools', () => {
 
       const handler = createCompareCitiesHandler(dispatch, fetchCities);
       await handler({
-        input: { 
-          cities: ['tokyo-japan', 'paris-france'], 
-          focus_attributes: ['culture_score', 'nightlife_score'] 
+        input: {
+          cities: ['tokyo-japan', 'paris-france'],
+          focus_attributes: ['culture_score', 'nightlife_score']
         },
         addToolResult,
       });

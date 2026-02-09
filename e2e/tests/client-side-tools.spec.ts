@@ -15,7 +15,7 @@ test.describe('Client-Side Tools Integration', () => {
   test('chat UI is interactive', async ({ page }) => {
     const travelChat = page.locator('[data-testid="travel-chat"]');
     await expect(travelChat).toBeVisible({ timeout: 30000 });
-    
+
     const heading = page.getByRole('heading', { name: 'Vibe-Check Travel Assistant' });
     await expect(heading).toBeVisible();
   });
@@ -23,7 +23,7 @@ test.describe('Client-Side Tools Integration', () => {
   test('suggestion chips are clickable', async ({ page }) => {
     const chips = page.locator('[class*="queryChip"]');
     await expect(chips.first()).toBeVisible();
-    
+
     const chipCount = await chips.count();
     expect(chipCount).toBeGreaterThanOrEqual(3);
   });
@@ -31,10 +31,10 @@ test.describe('Client-Side Tools Integration', () => {
   test('clear button resets conversation', async ({ page }) => {
     const clearButton = page.getByRole('button', { name: /clear/i });
     await expect(clearButton).toBeVisible();
-    
+
     await clearButton.click();
     await page.waitForTimeout(500);
-    
+
     const chatWidget = page.locator('[data-testid="travel-chat"]');
     await expect(chatWidget).toBeVisible();
   });
@@ -43,7 +43,7 @@ test.describe('Client-Side Tools Integration', () => {
 test.describe('Weather Tool Integration', () => {
   test('Weather service can be called', async ({ page }) => {
     await page.goto('/');
-    
+
     const response = await page.evaluate(async () => {
       try {
         const res = await fetch(
@@ -70,11 +70,11 @@ test.describe('Weather Tool Integration', () => {
       };
 
       const adviceParts: string[] = [];
-      
+
       if (mockWeather.temperature >= 30) {
         adviceParts.push('Stay hydrated and wear sunscreen');
       }
-      
+
       if (mockWeather.uvIndex >= 6) {
         adviceParts.push('High UV - protect your skin');
       }
@@ -91,11 +91,11 @@ test.describe('Weather Tool Integration', () => {
     const activities = await page.evaluate(() => {
       const mockWeather = { condition: 'sunny', temperature: 25 };
       const activities: string[] = [];
-      
+
       if (mockWeather.condition === 'sunny' && mockWeather.temperature > 20) {
         activities.push('Walking tours', 'Outdoor cafes', 'Parks and gardens');
       }
-      
+
       return activities;
     });
 
@@ -155,7 +155,7 @@ test.describe('Budget Tool Integration', () => {
     const estimates = await page.evaluate(() => {
       const baseCost = 150;
       const days = 5;
-      
+
       const styleMultipliers = {
         budget: 0.6,
         moderate: 1.0,
@@ -297,7 +297,7 @@ test.describe('Wishlist Tool Integration', () => {
 
     const result = await page.evaluate(() => {
       const wishlist: any[] = [];
-      
+
       wishlist.push({
         city: { objectID: 'tokyo-japan', city: 'Tokyo' },
         notes: null,
@@ -335,12 +335,12 @@ test.describe('Wishlist Tool Integration', () => {
       const wishlist = [
         { city: { objectID: 'tokyo-japan', city: 'Tokyo' }, notes: null, addedAt: Date.now() },
       ];
-      
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist));
-      
+
       const loaded = localStorage.getItem(STORAGE_KEY);
       const parsed = loaded ? JSON.parse(loaded) : [];
-      
+
       return {
         saved: true,
         loaded: parsed.length === 1,
@@ -385,7 +385,7 @@ test.describe('Comparison Tool Integration', () => {
       const bali = { culture_score: 8, nightlife_score: 7, beach_score: 9 };
 
       const diffs: Record<string, { winner: string; diff: number }> = {};
-      
+
       for (const key of Object.keys(tokyo) as Array<keyof typeof tokyo>) {
         const diff = tokyo[key] - bali[key];
         if (diff !== 0) {
@@ -411,13 +411,13 @@ test.describe('Preferences Tool Integration', () => {
 
     const result = await page.evaluate(() => {
       const preferences: Array<{ category: string; value: string; priority: string }> = [];
-      
+
       preferences.push({
         category: 'vibe',
         value: 'romantic',
         priority: 'must_have',
       });
-      
+
       preferences.push({
         category: 'budget',
         value: 'moderate',
@@ -473,10 +473,10 @@ test.describe('Preferences Tool Integration', () => {
       ];
 
       const countBefore = preferences.length;
-      
+
       preferences = preferences.filter(p => p.category !== 'vibe');
       const countAfterPartialClear = preferences.length;
-      
+
       preferences = [];
       const countAfterFullClear = preferences.length;
 
@@ -493,34 +493,34 @@ test.describe('Tool Visual Tests', () => {
   test('Homepage with tools UI', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
-    
+
     const chatWidget = page.locator('[data-testid="travel-chat"]');
     await expect(chatWidget).toBeVisible({ timeout: 15000 });
-    
+
     await page.screenshot({ path: 'e2e/.playwright-mcp/tools-01-homepage.png' });
   });
 
   test('Featured destinations with wishlist buttons', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
-    
+
     const cityCards = page.locator('article');
     await expect(cityCards.first()).toBeVisible({ timeout: 15000 });
-    
+
     const wishlistButtons = page.locator('[data-testid^="wishlist-button-"]');
     const buttonCount = await wishlistButtons.count();
     expect(buttonCount).toBeGreaterThan(0);
-    
+
     await page.screenshot({ path: 'e2e/.playwright-mcp/tools-02-wishlist-buttons.png' });
   });
 
   test('City detail page with plan trip button', async ({ page }) => {
     await page.goto('/city/tokyo-japan');
     await page.waitForLoadState('networkidle');
-    
+
     const planTripButton = page.getByRole('button', { name: /plan.*trip/i }).first();
     await expect(planTripButton).toBeVisible({ timeout: 10000 });
-    
+
     await page.screenshot({ path: 'e2e/.playwright-mcp/tools-03-city-detail.png' });
   });
 });

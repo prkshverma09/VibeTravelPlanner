@@ -12,18 +12,14 @@ interface MapPopupProps {
   city: AlgoliaCity;
   onClose: () => void;
   onViewDetails?: () => void;
-  onAddToItinerary?: () => void;
   onAskInChat?: (query: string) => void;
-  isInItinerary?: boolean;
 }
 
 export function MapPopup({
   city,
   onClose,
   onViewDetails,
-  onAddToItinerary,
   onAskInChat,
-  isInItinerary
 }: MapPopupProps) {
   if (!city._geoloc) return null;
 
@@ -36,6 +32,7 @@ export function MapPopup({
       closeOnClick={false}
       onClose={onClose}
       className={styles.popup}
+      maxWidth="320px"
     >
       <article 
         className={styles.card} 
@@ -95,19 +92,6 @@ export function MapPopup({
                 data-testid="popup-ask-in-chat"
               >
                 Ask in Chat
-              </button>
-            )}
-            {onAddToItinerary && (
-              <button
-                className={`${styles.itineraryButton} ${isInItinerary ? styles.inItinerary : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddToItinerary();
-                }}
-                type="button"
-                data-testid="popup-add-itinerary"
-              >
-                {isInItinerary ? 'Remove' : '+ Add'}
               </button>
             )}
           </div>

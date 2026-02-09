@@ -122,20 +122,6 @@ export default async function CityDetailPage({ params }: CityDetailPageProps) {
           </div>
         </section>
 
-        <section className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Travel Info</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <span className="text-gray-500 text-sm">Climate</span>
-              <p className="font-medium" data-testid="climate">{city.climate_type}</p>
-            </div>
-            <div>
-              <span className="text-gray-500 text-sm">Best Time to Visit</span>
-              <p className="font-medium" data-testid="best-time">{city.best_time_to_visit}</p>
-            </div>
-          </div>
-        </section>
-
         <section className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-2">Ready to explore {city.city}?</h2>
           <p className="text-white/90 mb-6 max-w-md mx-auto">

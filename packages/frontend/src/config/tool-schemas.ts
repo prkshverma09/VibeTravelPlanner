@@ -1,6 +1,6 @@
 /**
  * Client-Side Tool Schemas for Algolia Agent Studio
- * 
+ *
  * These schemas define the input/output structure for each tool
  * that can be invoked from the chat interface.
  */

@@ -14,6 +14,7 @@ import { weatherService } from '@/services/weather.service';
 import { budgetService, TravelStyle } from '@/services/budget.service';
 import { queryEnhancementService } from '@/services/query-enhancement.service';
 import type { AlgoliaCity } from '@vibe-travel/shared';
+import { enrichWithGeoloc } from '@/lib/enrichCities';
 import styles from './TravelChat.module.css';
 
 import { SearchIndexToolType, createDefaultTools } from 'react-instantsearch';
@@ -102,6 +103,10 @@ function bufferCity(city: AlgoliaCity) {
 }
 
 function clearBuffer() {
+  for (const c of pendingCitiesBuffer) {
+    currentBatchKeys.add(cityKey(c));
+  }
+
   const merged = new Set<string>();
   seenBatchKeys.forEach((k) => merged.add(k));
   currentBatchKeys.forEach((k) => merged.add(k));
@@ -361,6 +366,12 @@ export function TravelChat({
         submitButton.removeAttribute('disabled');
         submitButton.click();
       }
+      setTimeout(() => {
+        if (nativeInputValueSetter) {
+          nativeInputValueSetter.call(textarea, '');
+          textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, 50);
       onClearPendingChatQuery();
     };
     const t = setTimeout(submitAfter, 100);
@@ -510,7 +521,8 @@ export function TravelChat({
         (city, i, self) =>
           self.findIndex(
             (c) => c.city?.toLowerCase() === city.city?.toLowerCase()
-          ) === i
+          ) === i &&
+          !seenBatchKeys.has(cityKey(city))
       ).slice(0, 2);
 
       if (unique.length > 0) {
@@ -1049,7 +1061,21 @@ export function TravelChat({
     setShowFallback(false);
     setIsEnhancing(false);
     setVisibleResultsCount(2);
-    
+
+    const chatWidget = document.querySelector('[data-testid="chat-widget"]');
+    if (chatWidget) {
+      const textarea = chatWidget.querySelector('textarea') as HTMLTextAreaElement;
+      if (textarea) {
+        const setter = Object.getOwnPropertyDescriptor(
+          window.HTMLTextAreaElement.prototype, 'value'
+        )?.set;
+        if (setter) {
+          setter.call(textarea, '');
+          textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
+
     try {
       const keysToRemove: string[] = [];
       for (let i = 0; i < sessionStorage.length; i++) {
@@ -1175,7 +1201,7 @@ export function TravelChat({
             {visibleResults.length > 0 && (
               <div className={styles.miniMapWrap}>
                 <MiniMap
-                  cities={visibleResults}
+                  cities={enrichWithGeoloc(visibleResults)}
                   onMarkerClick={onMapCitySelect}
                 />
               </div>

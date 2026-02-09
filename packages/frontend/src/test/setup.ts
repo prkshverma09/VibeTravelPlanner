@@ -38,14 +38,14 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('next/image', () => ({
-  default: function MockImage({ 
-    src, 
-    alt, 
+  default: function MockImage({
+    src,
+    alt,
     fill,
-    ...props 
-  }: { 
-    src: string; 
-    alt: string; 
+    ...props
+  }: {
+    src: string;
+    alt: string;
     fill?: boolean;
     [key: string]: unknown;
   }) {
@@ -57,8 +57,8 @@ vi.mock('react-instantsearch', async (importOriginal) => {
   const actual = await importOriginal() as Record<string, unknown>;
   return {
     ...actual,
-    Chat: function MockChat({ 
-      agentId, 
+    Chat: function MockChat({
+      agentId,
       classNames,
       userMessageLeadingComponent,
       assistantMessageLeadingComponent,
@@ -66,8 +66,8 @@ vi.mock('react-instantsearch', async (importOriginal) => {
       translations,
       itemComponent,
       tools,
-    }: { 
-      agentId: string; 
+    }: {
+      agentId: string;
       classNames?: Record<string, unknown>;
       userMessageLeadingComponent?: React.ComponentType;
       assistantMessageLeadingComponent?: React.ComponentType;

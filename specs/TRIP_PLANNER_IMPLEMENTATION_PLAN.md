@@ -175,8 +175,8 @@ describe('Trip Test Utilities', () => {
   });
 
   it('should allow overriding default trip state', () => {
-    const store = mockTripPlannerStore({ 
-      trip: { destinationId: 'paris-france' } 
+    const store = mockTripPlannerStore({
+      trip: { destinationId: 'paris-france' }
     });
     expect(store.trip.destinationId).toBe('paris-france');
   });
@@ -216,7 +216,7 @@ describe('Algolia Mock Server', () => {
       aroundRadius: 1000,
       filters: 'category:cafe'
     });
-    
+
     expect(results.hits).toHaveLength(5);
     results.hits.forEach(hit => {
       expect(hit._geoloc).toBeDefined();
@@ -228,7 +228,7 @@ describe('Algolia Mock Server', () => {
     const results = await mockAlgoliaGeoSearch({
       filters: 'category:restaurant OR category:cafe'
     });
-    
+
     results.hits.forEach(hit => {
       expect(['restaurant', 'cafe']).toContain(hit.category);
     });
@@ -239,7 +239,7 @@ describe('Algolia Mock Server', () => {
       aroundLatLng: '25.2048, 55.2708',
       getRankingInfo: true
     });
-    
+
     const distances = results.hits.map(h => h._rankingInfo.geoDistance);
     expect(distances).toEqual([...distances].sort((a, b) => a - b));
   });
@@ -529,7 +529,7 @@ describe('Trip Budget Types', () => {
       food: { min: 300, max: 500 },
       transport: { min: 100, max: 150 },
     });
-    
+
     expect(budget.total.min).toBe(1100);
     expect(budget.total.max).toBe(1750);
   });
@@ -587,7 +587,7 @@ describe('TripSetupWizard', () => {
     city: 'Dubai',
     country: 'United Arab Emirates',
   };
-  
+
   const mockOnComplete = vi.fn();
   const mockOnCancel = vi.fn();
 
@@ -598,7 +598,7 @@ describe('TripSetupWizard', () => {
   describe('Rendering', () => {
     it('should render wizard container', () => {
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -608,7 +608,7 @@ describe('TripSetupWizard', () => {
 
     it('should display destination name in header', () => {
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -618,7 +618,7 @@ describe('TripSetupWizard', () => {
 
     it('should render step indicators', () => {
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -629,7 +629,7 @@ describe('TripSetupWizard', () => {
 
     it('should start on first step (dates)', () => {
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -642,7 +642,7 @@ describe('TripSetupWizard', () => {
     it('should navigate to next step on continue', async () => {
       const user = userEvent.setup();
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -655,7 +655,7 @@ describe('TripSetupWizard', () => {
       await user.click(screen.getByText('22'));
 
       await user.click(screen.getByRole('button', { name: /continue/i }));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('step-travelers')).toBeVisible();
       });
@@ -664,7 +664,7 @@ describe('TripSetupWizard', () => {
     it('should navigate back to previous step', async () => {
       const user = userEvent.setup();
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
           initialStep={1}
@@ -672,7 +672,7 @@ describe('TripSetupWizard', () => {
       );
 
       await user.click(screen.getByRole('button', { name: /back/i }));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('step-dates')).toBeVisible();
       });
@@ -680,7 +680,7 @@ describe('TripSetupWizard', () => {
 
     it('should disable continue when step is invalid', () => {
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -693,7 +693,7 @@ describe('TripSetupWizard', () => {
     it('should call onCancel when cancel button clicked', async () => {
       const user = userEvent.setup();
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
           onCancel={mockOnCancel}
@@ -708,7 +708,7 @@ describe('TripSetupWizard', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -720,7 +720,7 @@ describe('TripSetupWizard', () => {
     it('should manage focus when navigating steps', async () => {
       const user = userEvent.setup();
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
           initialStep={0}
@@ -730,7 +730,7 @@ describe('TripSetupWizard', () => {
       // Complete step 1
       // ... fill dates
       await user.click(screen.getByRole('button', { name: /continue/i }));
-      
+
       await waitFor(() => {
         // First focusable element in new step should have focus
         expect(document.activeElement).toBe(screen.getByLabelText(/adults/i));
@@ -739,7 +739,7 @@ describe('TripSetupWizard', () => {
 
     it('should announce step changes to screen readers', async () => {
       render(
-        <TripSetupWizard 
+        <TripSetupWizard
           destination={mockDestination}
           onComplete={mockOnComplete}
         />
@@ -816,9 +816,9 @@ describe('DateRangeStep', () => {
   it('should not allow selecting past dates', async () => {
     const user = userEvent.setup();
     render(<DateRangeStep onChange={vi.fn()} />);
-    
+
     await user.click(screen.getByLabelText(/start date/i));
-    
+
     // Past dates should be disabled
     const pastDate = screen.getByText('1'); // Assuming it's past
     expect(pastDate).toHaveAttribute('aria-disabled', 'true');
@@ -828,10 +828,10 @@ describe('DateRangeStep', () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(<DateRangeStep onChange={onChange} defaultDuration={7} />);
-    
+
     await user.click(screen.getByLabelText(/start date/i));
     await user.click(screen.getByText('15'));
-    
+
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         end: expect.any(String) // 7 days after start
@@ -843,35 +843,35 @@ describe('DateRangeStep', () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(<DateRangeStep onChange={onChange} />);
-    
+
     // Select same day for start and end
     await user.click(screen.getByLabelText(/start date/i));
     await user.click(screen.getByText('15'));
     await user.click(screen.getByLabelText(/end date/i));
     await user.click(screen.getByText('15'));
-    
+
     expect(screen.getByText(/minimum 1 day/i)).toBeInTheDocument();
   });
 
   it('should display trip duration', async () => {
     render(
-      <DateRangeStep 
-        onChange={vi.fn()} 
+      <DateRangeStep
+        onChange={vi.fn()}
         value={{ start: '2026-03-15', end: '2026-03-22' }}
       />
     );
-    
+
     expect(screen.getByText(/7 days/i)).toBeInTheDocument();
   });
 
   it('should show best time to visit hint', () => {
     render(
-      <DateRangeStep 
-        onChange={vi.fn()} 
+      <DateRangeStep
+        onChange={vi.fn()}
         bestTimeToVisit="November to March"
       />
     );
-    
+
     expect(screen.getByText(/best time.*november to march/i)).toBeInTheDocument();
   });
 });
@@ -919,32 +919,32 @@ describe('TravelerStep', () => {
   it('should not allow 0 adults', async () => {
     const user = userEvent.setup();
     render(<TravelerStep onChange={vi.fn()} />);
-    
+
     const decrementAdult = screen.getByRole('button', { name: /decrease adults/i });
     await user.click(decrementAdult);
-    
+
     expect(screen.getByTestId('adult-count')).toHaveTextContent('1');
   });
 
   it('should prompt for children ages when children > 0', async () => {
     const user = userEvent.setup();
     render(<TravelerStep onChange={vi.fn()} />);
-    
+
     const incrementChildren = screen.getByRole('button', { name: /increase children/i });
     await user.click(incrementChildren);
-    
+
     expect(screen.getByLabelText(/child 1 age/i)).toBeInTheDocument();
   });
 
   it('should limit maximum travelers', () => {
     render(<TravelerStep onChange={vi.fn()} maxTravelers={10} />);
-    
+
     // Assuming we start with 1 adult, max 9 more
     const incrementAdult = screen.getByRole('button', { name: /increase adults/i });
     for (let i = 0; i < 15; i++) {
       fireEvent.click(incrementAdult);
     }
-    
+
     expect(screen.getByTestId('adult-count')).toHaveTextContent('10');
   });
 
@@ -952,9 +952,9 @@ describe('TravelerStep', () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(<TravelerStep onChange={onChange} />);
-    
+
     await user.click(screen.getByRole('button', { name: /increase adults/i }));
-    
+
     expect(onChange).toHaveBeenCalledWith({
       adults: 2,
       children: 0,
@@ -990,7 +990,7 @@ describe('PreferenceStep', () => {
   describe('Budget Level', () => {
     it('should render all budget options', () => {
       render(<PreferenceStep onChange={vi.fn()} />);
-      
+
       expect(screen.getByRole('radio', { name: /budget/i })).toBeInTheDocument();
       expect(screen.getByRole('radio', { name: /moderate/i })).toBeInTheDocument();
       expect(screen.getByRole('radio', { name: /luxury/i })).toBeInTheDocument();
@@ -999,7 +999,7 @@ describe('PreferenceStep', () => {
 
     it('should show estimated daily cost for each option', () => {
       render(<PreferenceStep onChange={vi.fn()} destination="dubai-uae" />);
-      
+
       expect(screen.getByText(/\$50-100\/day/)).toBeInTheDocument(); // Budget
       expect(screen.getByText(/\$100-200\/day/)).toBeInTheDocument(); // Moderate
     });
@@ -1008,7 +1008,7 @@ describe('PreferenceStep', () => {
   describe('Trip Style', () => {
     it('should render all trip style options', () => {
       render(<PreferenceStep onChange={vi.fn()} />);
-      
+
       expect(screen.getByRole('checkbox', { name: /cultural immersion/i })).toBeInTheDocument();
       expect(screen.getByRole('checkbox', { name: /food & culinary/i })).toBeInTheDocument();
     });
@@ -1017,10 +1017,10 @@ describe('PreferenceStep', () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
       render(<PreferenceStep onChange={onChange} />);
-      
+
       await user.click(screen.getByRole('checkbox', { name: /cultural/i }));
       await user.click(screen.getByRole('checkbox', { name: /food/i }));
-      
+
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({
           tripStyle: expect.arrayContaining(['Cultural Immersion', 'Food & Culinary'])
@@ -1030,7 +1030,7 @@ describe('PreferenceStep', () => {
 
     it('should require at least one style selection', () => {
       render(<PreferenceStep onChange={vi.fn()} />);
-      
+
       expect(screen.getByText(/select at least one/i)).toBeInTheDocument();
     });
   });
@@ -1038,7 +1038,7 @@ describe('PreferenceStep', () => {
   describe('Pace Selection', () => {
     it('should render pace options', () => {
       render(<PreferenceStep onChange={vi.fn()} />);
-      
+
       expect(screen.getByRole('radio', { name: /relaxed/i })).toBeInTheDocument();
       expect(screen.getByRole('radio', { name: /moderate/i })).toBeInTheDocument();
       expect(screen.getByRole('radio', { name: /packed/i })).toBeInTheDocument();
@@ -1046,7 +1046,7 @@ describe('PreferenceStep', () => {
 
     it('should show activities per day for each pace', () => {
       render(<PreferenceStep onChange={vi.fn()} />);
-      
+
       expect(screen.getByText(/2-3 activities\/day/i)).toBeInTheDocument(); // Relaxed
       expect(screen.getByText(/4-5 activities\/day/i)).toBeInTheDocument(); // Moderate
       expect(screen.getByText(/6-8 activities\/day/i)).toBeInTheDocument(); // Packed
@@ -1056,7 +1056,7 @@ describe('PreferenceStep', () => {
   describe('Accessibility', () => {
     it('should have accessible mobility options', () => {
       render(<PreferenceStep onChange={vi.fn()} showAccessibility />);
-      
+
       expect(screen.getByRole('radio', { name: /full mobility/i })).toBeInTheDocument();
       expect(screen.getByRole('radio', { name: /limited mobility/i })).toBeInTheDocument();
       expect(screen.getByRole('radio', { name: /wheelchair/i })).toBeInTheDocument();
@@ -1103,7 +1103,7 @@ describe('ReviewStep', () => {
 
   it('should display all trip setup information', () => {
     render(<ReviewStep setup={mockSetup} destination={mockDestination} />);
-    
+
     expect(screen.getByText(/dubai/i)).toBeInTheDocument();
     expect(screen.getByText(/mar 15.*mar 22/i)).toBeInTheDocument();
     expect(screen.getByText(/2 adults/i)).toBeInTheDocument();
@@ -1113,7 +1113,7 @@ describe('ReviewStep', () => {
 
   it('should show estimated total cost', () => {
     render(<ReviewStep setup={mockSetup} destination={mockDestination} />);
-    
+
     expect(screen.getByText(/estimated cost/i)).toBeInTheDocument();
     expect(screen.getByText(/\$\d+.*\$\d+/)).toBeInTheDocument();
   });
@@ -1122,20 +1122,20 @@ describe('ReviewStep', () => {
     const onEdit = vi.fn();
     const user = userEvent.setup();
     render(
-      <ReviewStep 
-        setup={mockSetup} 
+      <ReviewStep
+        setup={mockSetup}
         destination={mockDestination}
         onEdit={onEdit}
       />
     );
-    
+
     await user.click(screen.getByRole('button', { name: /edit dates/i }));
     expect(onEdit).toHaveBeenCalledWith('dates');
   });
 
   it('should have confirm button', () => {
     render(<ReviewStep setup={mockSetup} destination={mockDestination} />);
-    
+
     expect(screen.getByRole('button', { name: /start planning/i })).toBeInTheDocument();
   });
 });
@@ -1167,9 +1167,9 @@ describe('TripSetupWizard Integration', () => {
   it('should complete full wizard flow and call onComplete', async () => {
     const onComplete = vi.fn();
     const user = userEvent.setup();
-    
+
     render(
-      <TripSetupWizard 
+      <TripSetupWizard
         destination={mockDestination}
         onComplete={onComplete}
       />
@@ -1211,9 +1211,9 @@ describe('TripSetupWizard Integration', () => {
 
   it('should preserve state when navigating back', async () => {
     const user = userEvent.setup();
-    
+
     render(
-      <TripSetupWizard 
+      <TripSetupWizard
         destination={mockDestination}
         onComplete={vi.fn()}
       />
@@ -1262,7 +1262,7 @@ describe('ItineraryContext', () => {
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: ItineraryProvider
       });
-      
+
       expect(result.current.itinerary).toBeNull();
       expect(result.current.isLoading).toBe(false);
     });
@@ -1271,11 +1271,11 @@ describe('ItineraryContext', () => {
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: ItineraryProvider
       });
-      
+
       await act(async () => {
         await result.current.initializeItinerary(mockTripSetup);
       });
-      
+
       expect(result.current.itinerary).toBeDefined();
       expect(result.current.itinerary?.destination.objectID).toBe('dubai-uae');
       expect(result.current.itinerary?.days).toHaveLength(7);
@@ -1285,11 +1285,11 @@ describe('ItineraryContext', () => {
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: createProviderWithItinerary(mockItinerary)
       });
-      
+
       await act(async () => {
         await result.current.addActivity(1, mockActivity);
       });
-      
+
       const day1 = result.current.itinerary?.days.find(d => d.dayNumber === 1);
       expect(day1?.activities).toContainEqual(
         expect.objectContaining({ id: mockActivity.id })
@@ -1300,13 +1300,13 @@ describe('ItineraryContext', () => {
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: createProviderWithItinerary(mockItineraryWithActivities)
       });
-      
+
       const activityToRemove = mockItineraryWithActivities.days[0].activities[0];
-      
+
       await act(async () => {
         await result.current.removeActivity(1, activityToRemove.id);
       });
-      
+
       const day1 = result.current.itinerary?.days.find(d => d.dayNumber === 1);
       expect(day1?.activities).not.toContainEqual(
         expect.objectContaining({ id: activityToRemove.id })
@@ -1317,11 +1317,11 @@ describe('ItineraryContext', () => {
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: createProviderWithItinerary(mockItineraryWithActivities)
       });
-      
+
       await act(async () => {
         await result.current.reorderActivities(1, 0, 2); // Move first to third position
       });
-      
+
       const day1 = result.current.itinerary?.days.find(d => d.dayNumber === 1);
       expect(day1?.activities[2].id).toBe(mockItineraryWithActivities.days[0].activities[0].id);
     });
@@ -1330,13 +1330,13 @@ describe('ItineraryContext', () => {
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: createProviderWithItinerary(mockItinerary)
       });
-      
+
       const initialCost = result.current.itinerary?.totalEstimatedCost.total;
-      
+
       await act(async () => {
         await result.current.addActivity(1, { ...mockActivity, price: { amount: 100 } });
       });
-      
+
       expect(result.current.itinerary?.totalEstimatedCost.total).toBeGreaterThan(initialCost);
     });
   });
@@ -1346,26 +1346,26 @@ describe('ItineraryContext', () => {
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: ItineraryProvider
       });
-      
+
       await act(async () => {
         await result.current.initializeItinerary(mockTripSetup);
         await result.current.saveItinerary();
       });
-      
+
       expect(localStorage.getItem('trip_dubai-uae')).toBeDefined();
     });
 
     it('should restore itinerary from localStorage', async () => {
       localStorage.setItem('trip_dubai-uae', JSON.stringify(mockSavedItinerary));
-      
+
       const { result } = renderHook(() => useItineraryContext(), {
         wrapper: ItineraryProvider
       });
-      
+
       await act(async () => {
         await result.current.loadItinerary('dubai-uae');
       });
-      
+
       expect(result.current.itinerary).toEqual(mockSavedItinerary);
     });
   });
@@ -1409,14 +1409,14 @@ describe('DayPlanner', () => {
   describe('Rendering', () => {
     it('should render day header with theme', () => {
       render(<DayPlanner day={mockDay} />);
-      
+
       expect(screen.getByText(/day 1/i)).toBeInTheDocument();
       expect(screen.getByText(/old dubai/i)).toBeInTheDocument();
     });
 
     it('should render timeline of activities', () => {
       render(<DayPlanner day={mockDay} />);
-      
+
       expect(screen.getByText('Al Fahidi District')).toBeInTheDocument();
       expect(screen.getByText('Creek Abra Ride')).toBeInTheDocument();
       expect(screen.getByText('14:00')).toBeInTheDocument();
@@ -1425,13 +1425,13 @@ describe('DayPlanner', () => {
 
     it('should show estimated cost for day', () => {
       render(<DayPlanner day={mockDay} />);
-      
+
       expect(screen.getByText(/\$50/)).toBeInTheDocument();
     });
 
     it('should show travel time between activities', () => {
       render(<DayPlanner day={mockDay} showTravelTime />);
-      
+
       expect(screen.getByText(/travel.*15 min/i)).toBeInTheDocument();
     });
   });
@@ -1440,53 +1440,53 @@ describe('DayPlanner', () => {
     it('should allow adding activity via button', async () => {
       const onAddActivity = vi.fn();
       const user = userEvent.setup();
-      
+
       render(<DayPlanner day={mockDay} onAddActivity={onAddActivity} />);
-      
+
       await user.click(screen.getByRole('button', { name: /add activity/i }));
-      
+
       expect(onAddActivity).toHaveBeenCalledWith(1);
     });
 
     it('should allow removing activity', async () => {
       const onRemoveActivity = vi.fn();
       const user = userEvent.setup();
-      
+
       render(<DayPlanner day={mockDay} onRemoveActivity={onRemoveActivity} />);
-      
+
       const removeButtons = screen.getAllByRole('button', { name: /remove/i });
       await user.click(removeButtons[0]);
-      
+
       expect(onRemoveActivity).toHaveBeenCalledWith(1, 'act1');
     });
 
     it('should allow drag-and-drop reordering', async () => {
       const onReorder = vi.fn();
-      
+
       render(<DayPlanner day={mockDay} onReorder={onReorder} />);
-      
+
       // Simulate drag and drop
       const activities = screen.getAllByTestId('activity-card');
       fireEvent.dragStart(activities[0]);
       fireEvent.dragOver(activities[1]);
       fireEvent.drop(activities[1]);
-      
+
       expect(onReorder).toHaveBeenCalledWith(1, 0, 1);
     });
 
     it('should allow editing activity time', async () => {
       const onUpdateActivity = vi.fn();
       const user = userEvent.setup();
-      
+
       render(<DayPlanner day={mockDay} onUpdateActivity={onUpdateActivity} />);
-      
+
       await user.click(screen.getByText('14:00'));
       await user.clear(screen.getByRole('textbox', { name: /time/i }));
       await user.type(screen.getByRole('textbox', { name: /time/i }), '15:00');
       await user.click(screen.getByRole('button', { name: /save/i }));
-      
+
       expect(onUpdateActivity).toHaveBeenCalledWith(
-        1, 'act1', 
+        1, 'act1',
         expect.objectContaining({ startTime: '15:00' })
       );
     });
@@ -1495,7 +1495,7 @@ describe('DayPlanner', () => {
   describe('Accessibility', () => {
     it('should have proper list structure', () => {
       render(<DayPlanner day={mockDay} />);
-      
+
       expect(screen.getByRole('list', { name: /activities/i })).toBeInTheDocument();
       expect(screen.getAllByRole('listitem')).toHaveLength(2);
     });
@@ -1503,14 +1503,14 @@ describe('DayPlanner', () => {
     it('should support keyboard reordering', async () => {
       const onReorder = vi.fn();
       const user = userEvent.setup();
-      
+
       render(<DayPlanner day={mockDay} onReorder={onReorder} />);
-      
+
       const firstActivity = screen.getAllByTestId('activity-card')[0];
       firstActivity.focus();
-      
+
       await user.keyboard('{Alt>}{ArrowDown}{/Alt}');
-      
+
       expect(onReorder).toHaveBeenCalledWith(1, 0, 1);
     });
   });
@@ -1557,46 +1557,46 @@ describe('ActivityCard', () => {
 
   it('should render activity name and time', () => {
     render(<ActivityCard activity={mockActivity} />);
-    
+
     expect(screen.getByText('Desert Safari')).toBeInTheDocument();
     expect(screen.getByText('15:00')).toBeInTheDocument();
   });
 
   it('should show duration in human-readable format', () => {
     render(<ActivityCard activity={mockActivity} />);
-    
+
     expect(screen.getByText(/6h/)).toBeInTheDocument();
   });
 
   it('should show price range', () => {
     render(<ActivityCard activity={mockActivity} />);
-    
+
     expect(screen.getByText(/\$75.*\$100/)).toBeInTheDocument();
   });
 
   it('should indicate booking requirement', () => {
     render(<ActivityCard activity={mockActivity} />);
-    
+
     expect(screen.getByText(/booking required/i)).toBeInTheDocument();
   });
 
   it('should show rating with stars', () => {
     render(<ActivityCard activity={mockActivity} />);
-    
+
     expect(screen.getByText('4.7')).toBeInTheDocument();
     expect(screen.getByLabelText(/4.7 out of 5/i)).toBeInTheDocument();
   });
 
   it('should render action buttons', () => {
     render(
-      <ActivityCard 
+      <ActivityCard
         activity={mockActivity}
         onSwap={vi.fn()}
         onRemove={vi.fn()}
         onViewDetails={vi.fn()}
       />
     );
-    
+
     expect(screen.getByRole('button', { name: /swap/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /remove/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /details/i })).toBeInTheDocument();
@@ -1604,11 +1604,11 @@ describe('ActivityCard', () => {
 
   it('should show booking link when provided', () => {
     render(
-      <ActivityCard 
+      <ActivityCard
         activity={{ ...mockActivity, bookingUrl: 'https://book.example.com' }}
       />
     );
-    
+
     expect(screen.getByRole('link', { name: /book/i })).toHaveAttribute(
       'href', 'https://book.example.com'
     );
@@ -1616,7 +1616,7 @@ describe('ActivityCard', () => {
 
   it('should be draggable when in edit mode', () => {
     render(<ActivityCard activity={mockActivity} editable />);
-    
+
     const card = screen.getByTestId('activity-card');
     expect(card).toHaveAttribute('draggable', 'true');
   });
@@ -1648,14 +1648,14 @@ Create `packages/frontend/src/components/ActivityCard/ActivityCard.tsx`
 describe('ItineraryTimeline', () => {
   it('should render all days as tabs', () => {
     render(<ItineraryTimeline itinerary={mockItinerary} />);
-    
+
     expect(screen.getAllByRole('tab')).toHaveLength(7);
     expect(screen.getByRole('tab', { name: /day 1/i })).toBeInTheDocument();
   });
 
   it('should show active day content', () => {
     render(<ItineraryTimeline itinerary={mockItinerary} />);
-    
+
     expect(screen.getByRole('tabpanel')).toBeVisible();
     expect(screen.getByText(/day 1/i)).toBeInTheDocument();
   });
@@ -1663,32 +1663,32 @@ describe('ItineraryTimeline', () => {
   it('should switch days on tab click', async () => {
     const user = userEvent.setup();
     render(<ItineraryTimeline itinerary={mockItinerary} />);
-    
+
     await user.click(screen.getByRole('tab', { name: /day 3/i }));
-    
+
     expect(screen.getByRole('tabpanel')).toHaveTextContent(/day 3/i);
   });
 
   it('should show day themes in tabs', () => {
     render(<ItineraryTimeline itinerary={mockItinerary} />);
-    
+
     expect(screen.getByRole('tab', { name: /old dubai/i })).toBeInTheDocument();
   });
 
   it('should allow keyboard navigation between days', async () => {
     const user = userEvent.setup();
     render(<ItineraryTimeline itinerary={mockItinerary} />);
-    
+
     const tabs = screen.getAllByRole('tab');
     tabs[0].focus();
-    
+
     await user.keyboard('{ArrowRight}');
     expect(tabs[1]).toHaveFocus();
   });
 
   it('should display summary statistics', () => {
     render(<ItineraryTimeline itinerary={mockItinerary} showSummary />);
-    
+
     expect(screen.getByText(/7 days/i)).toBeInTheDocument();
     expect(screen.getByText(/\d+ activities/i)).toBeInTheDocument();
     expect(screen.getByText(/estimated.*\$/i)).toBeInTheDocument();
@@ -1734,9 +1734,9 @@ describe('useNeighborhoodSearch', () => {
       center: { lat: 25.2048, lng: 55.2708 },
       radius: 1000,
     }));
-    
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    
+
     expect(result.current.pois).toHaveLength(2);
     expect(mockAlgoliaSearch).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -1755,9 +1755,9 @@ describe('useNeighborhoodSearch', () => {
       }),
       { initialProps: { category: 'cafe' } }
     );
-    
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    
+
     expect(mockAlgoliaSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         filters: expect.stringContaining('category:cafe'),
@@ -1768,21 +1768,21 @@ describe('useNeighborhoodSearch', () => {
   it('should apply contextual filters based on time of day', async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-03-15T09:00:00'));
-    
+
     const { result } = renderHook(() => useNeighborhoodSearch({
       center: { lat: 25.2048, lng: 55.2708 },
       contextualFiltering: true,
     }));
-    
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    
+
     // Morning = prioritize cafes/bakeries
     expect(mockAlgoliaSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         optionalFilters: expect.arrayContaining(['category:cafe', 'category:bakery']),
       })
     );
-    
+
     vi.useRealTimers();
   });
 
@@ -1791,9 +1791,9 @@ describe('useNeighborhoodSearch', () => {
       center: { lat: 25.2048, lng: 55.2708 },
       groupByCategory: true,
     }));
-    
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    
+
     expect(result.current.groupedPois).toHaveProperty('cafe');
     expect(result.current.groupedPois).toHaveProperty('restaurant');
   });
@@ -1802,9 +1802,9 @@ describe('useNeighborhoodSearch', () => {
     const { result } = renderHook(() => useNeighborhoodSearch({
       center: { lat: 25.2048, lng: 55.2708 },
     }));
-    
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    
+
     result.current.pois.forEach(poi => {
       expect(poi.distance).toBeDefined();
       expect(typeof poi.distance).toBe('number');
@@ -1813,13 +1813,13 @@ describe('useNeighborhoodSearch', () => {
 
   it('should handle search errors gracefully', async () => {
     vi.mocked(mockAlgoliaSearch).mockRejectedValue(new Error('Search failed'));
-    
+
     const { result } = renderHook(() => useNeighborhoodSearch({
       center: { lat: 25.2048, lng: 55.2708 },
     }));
-    
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    
+
     expect(result.current.error).toBeDefined();
     expect(result.current.pois).toEqual([]);
   });
@@ -1865,7 +1865,7 @@ describe('NeighborhoodExplorer', () => {
   describe('Rendering', () => {
     it('should render explorer panel', () => {
       render(<NeighborhoodExplorer center={mockCenter} locationName={mockLocation} />);
-      
+
       expect(screen.getByTestId('neighborhood-explorer')).toBeInTheDocument();
       expect(screen.getByText(/near your hotel/i)).toBeInTheDocument();
       expect(screen.getByText(/rove downtown/i)).toBeInTheDocument();
@@ -1873,7 +1873,7 @@ describe('NeighborhoodExplorer', () => {
 
     it('should render category tabs', () => {
       render(<NeighborhoodExplorer center={mockCenter} locationName={mockLocation} />);
-      
+
       expect(screen.getByRole('tab', { name: /coffee/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /lunch/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /culture/i })).toBeInTheDocument();
@@ -1881,7 +1881,7 @@ describe('NeighborhoodExplorer', () => {
 
     it('should render POI cards for selected category', () => {
       render(<NeighborhoodExplorer center={mockCenter} locationName={mockLocation} />);
-      
+
       expect(screen.getAllByTestId('poi-card').length).toBeGreaterThan(0);
     });
 
@@ -1892,9 +1892,9 @@ describe('NeighborhoodExplorer', () => {
         isLoading: true,
         error: null,
       });
-      
+
       render(<NeighborhoodExplorer center={mockCenter} locationName={mockLocation} />);
-      
+
       expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
     });
   });
@@ -1903,26 +1903,26 @@ describe('NeighborhoodExplorer', () => {
     it('should filter POIs when category tab clicked', async () => {
       const user = userEvent.setup();
       render(<NeighborhoodExplorer center={mockCenter} locationName={mockLocation} />);
-      
+
       await user.click(screen.getByRole('tab', { name: /lunch/i }));
-      
+
       expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', 'tab-lunch');
     });
 
     it('should call onAddToItinerary when POI is added', async () => {
       const onAdd = vi.fn();
       const user = userEvent.setup();
-      
+
       render(
-        <NeighborhoodExplorer 
-          center={mockCenter} 
+        <NeighborhoodExplorer
+          center={mockCenter}
           locationName={mockLocation}
           onAddToItinerary={onAdd}
         />
       );
-      
+
       await user.click(screen.getAllByRole('button', { name: /add to day/i })[0]);
-      
+
       expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({
         poi: mockPOIs[0],
       }));
@@ -1931,26 +1931,26 @@ describe('NeighborhoodExplorer', () => {
     it('should show POI details on card click', async () => {
       const user = userEvent.setup();
       render(<NeighborhoodExplorer center={mockCenter} locationName={mockLocation} />);
-      
+
       await user.click(screen.getAllByTestId('poi-card')[0]);
-      
+
       expect(screen.getByTestId('poi-detail-modal')).toBeVisible();
     });
 
     it('should allow closing explorer', async () => {
       const onClose = vi.fn();
       const user = userEvent.setup();
-      
+
       render(
-        <NeighborhoodExplorer 
-          center={mockCenter} 
+        <NeighborhoodExplorer
+          center={mockCenter}
           locationName={mockLocation}
           onClose={onClose}
         />
       );
-      
+
       await user.click(screen.getByRole('button', { name: /close/i }));
-      
+
       expect(onClose).toHaveBeenCalled();
     });
   });
@@ -1959,17 +1959,17 @@ describe('NeighborhoodExplorer', () => {
     it('should highlight POI on map when hovered', async () => {
       const onHighlight = vi.fn();
       const user = userEvent.setup();
-      
+
       render(
-        <NeighborhoodExplorer 
-          center={mockCenter} 
+        <NeighborhoodExplorer
+          center={mockCenter}
           locationName={mockLocation}
           onHighlightPOI={onHighlight}
         />
       );
-      
+
       await user.hover(screen.getAllByTestId('poi-card')[0]);
-      
+
       expect(onHighlight).toHaveBeenCalledWith(mockPOIs[0]._geoloc);
     });
   });
@@ -2034,10 +2034,10 @@ describe('POICard', () => {
   it('should show open/closed status', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-03-16T10:00:00')); // Monday 10am
-    
+
     render(<POICard poi={mockPOI} />);
     expect(screen.getByText(/open/i)).toBeInTheDocument();
-    
+
     vi.useRealTimers();
   });
 
@@ -2049,10 +2049,10 @@ describe('POICard', () => {
   it('should call onAdd when add button clicked', async () => {
     const onAdd = vi.fn();
     const user = userEvent.setup();
-    
+
     render(<POICard poi={mockPOI} onAdd={onAdd} />);
     await user.click(screen.getByRole('button', { name: /add/i }));
-    
+
     expect(onAdd).toHaveBeenCalledWith(mockPOI);
   });
 });
@@ -2090,7 +2090,7 @@ describe('ActivitySearch', () => {
 
   it('should render category filters', () => {
     render(<ActivitySearch destinationId="dubai-uae" />);
-    
+
     expect(screen.getByRole('checkbox', { name: /adventure/i })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /cultural/i })).toBeInTheDocument();
   });
@@ -2098,9 +2098,9 @@ describe('ActivitySearch', () => {
   it('should search activities on query input', async () => {
     const user = userEvent.setup();
     render(<ActivitySearch destinationId="dubai-uae" />);
-    
+
     await user.type(screen.getByRole('searchbox'), 'desert safari');
-    
+
     await waitFor(() => {
       expect(mockAlgoliaSearch).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -2114,10 +2114,10 @@ describe('ActivitySearch', () => {
   it('should filter by price range', async () => {
     const user = userEvent.setup();
     render(<ActivitySearch destinationId="dubai-uae" />);
-    
+
     await user.click(screen.getByRole('button', { name: /price/i }));
     await user.click(screen.getByRole('option', { name: /under \$50/i }));
-    
+
     await waitFor(() => {
       expect(mockAlgoliaSearch).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -2130,10 +2130,10 @@ describe('ActivitySearch', () => {
   it('should filter by duration', async () => {
     const user = userEvent.setup();
     render(<ActivitySearch destinationId="dubai-uae" />);
-    
+
     await user.click(screen.getByRole('button', { name: /duration/i }));
     await user.click(screen.getByRole('option', { name: /half day/i }));
-    
+
     await waitFor(() => {
       expect(mockAlgoliaSearch).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -2147,9 +2147,9 @@ describe('ActivitySearch', () => {
     vi.mocked(mockAlgoliaSearch).mockResolvedValue(
       createMockSearchResponse([mockActivity])
     );
-    
+
     render(<ActivitySearch destinationId="dubai-uae" />);
-    
+
     await waitFor(() => {
       expect(screen.getByText(mockActivity.name)).toBeInTheDocument();
     });
@@ -2161,12 +2161,12 @@ describe('ActivitySearch', () => {
     vi.mocked(mockAlgoliaSearch).mockResolvedValue(
       createMockSearchResponse([mockActivity])
     );
-    
+
     render(<ActivitySearch destinationId="dubai-uae" onSelect={onSelect} />);
-    
+
     await waitFor(() => screen.getByText(mockActivity.name));
     await user.click(screen.getByRole('button', { name: /add/i }));
-    
+
     expect(onSelect).toHaveBeenCalledWith(mockActivity);
   });
 });
@@ -2200,7 +2200,7 @@ Create `packages/frontend/src/components/ActivitySearch/ActivitySearch.tsx`
 describe('useBudgetCalculator', () => {
   it('should calculate total from itinerary activities', () => {
     const { result } = renderHook(() => useBudgetCalculator(mockItinerary));
-    
+
     expect(result.current.total.activities).toBeGreaterThan(0);
     expect(result.current.total.sum).toBeDefined();
   });
@@ -2210,14 +2210,14 @@ describe('useBudgetCalculator', () => {
       ...mockItinerary,
       setup: { ...mockTripSetup, budgetLevel: 'moderate' },
     }));
-    
+
     expect(result.current.total.accommodation).toBeDefined();
     expect(result.current.total.accommodation.min).toBeGreaterThan(0);
   });
 
   it('should estimate food cost per day', () => {
     const { result } = renderHook(() => useBudgetCalculator(mockItinerary));
-    
+
     expect(result.current.total.food).toBeDefined();
     expect(result.current.perDay.food).toBeGreaterThan(0);
   });
@@ -2227,7 +2227,7 @@ describe('useBudgetCalculator', () => {
       ...mockItinerary,
       setup: { ...mockTripSetup, travelers: { adults: 2, children: 1 } },
     }));
-    
+
     expect(result.current.perPerson).toBeDefined();
     expect(result.current.perPerson).toBeLessThan(result.current.total.sum);
   });
@@ -2237,7 +2237,7 @@ describe('useBudgetCalculator', () => {
       ...mockItinerary,
       budget: { limit: 1000 },
     }));
-    
+
     expect(['under', 'on-track', 'over']).toContain(result.current.status);
   });
 
@@ -2246,7 +2246,7 @@ describe('useBudgetCalculator', () => {
       ...mockItinerary,
       budget: { limit: 500 }, // Low limit to trigger savings
     }));
-    
+
     expect(result.current.savingsOpportunities.length).toBeGreaterThan(0);
     result.current.savingsOpportunities.forEach(opp => {
       expect(opp.savings).toBeGreaterThan(0);
@@ -2259,16 +2259,16 @@ describe('useBudgetCalculator', () => {
       ({ itinerary }) => useBudgetCalculator(itinerary),
       { initialProps: { itinerary: mockItinerary } }
     );
-    
+
     const initialTotal = result.current.total.sum;
-    
-    rerender({ 
+
+    rerender({
       itinerary: {
         ...mockItinerary,
         days: [...mockItinerary.days, mockExpensiveDay],
       }
     });
-    
+
     expect(result.current.total.sum).toBeGreaterThan(initialTotal);
   });
 });
@@ -2300,20 +2300,20 @@ Create `packages/frontend/src/hooks/useBudgetCalculator.ts`
 describe('BudgetDashboard', () => {
   it('should render budget overview', () => {
     render(<BudgetDashboard itinerary={mockItinerary} />);
-    
+
     expect(screen.getByTestId('budget-dashboard')).toBeInTheDocument();
     expect(screen.getByText(/estimated cost/i)).toBeInTheDocument();
   });
 
   it('should show progress bar for budget status', () => {
     render(<BudgetDashboard itinerary={mockItinerary} budgetLimit={2000} />);
-    
+
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('should show category breakdown', () => {
     render(<BudgetDashboard itinerary={mockItinerary} />);
-    
+
     expect(screen.getByText(/accommodation/i)).toBeInTheDocument();
     expect(screen.getByText(/activities/i)).toBeInTheDocument();
     expect(screen.getByText(/food/i)).toBeInTheDocument();
@@ -2322,14 +2322,14 @@ describe('BudgetDashboard', () => {
 
   it('should show warning when over budget', () => {
     render(<BudgetDashboard itinerary={mockExpensiveItinerary} budgetLimit={500} />);
-    
+
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText(/over budget/i)).toBeInTheDocument();
   });
 
   it('should show savings suggestions when over budget', () => {
     render(<BudgetDashboard itinerary={mockExpensiveItinerary} budgetLimit={500} />);
-    
+
     expect(screen.getByText(/ways to save/i)).toBeInTheDocument();
     expect(screen.getAllByTestId('savings-suggestion').length).toBeGreaterThan(0);
   });
@@ -2337,17 +2337,17 @@ describe('BudgetDashboard', () => {
   it('should allow applying savings suggestion', async () => {
     const onApplySuggestion = vi.fn();
     const user = userEvent.setup();
-    
+
     render(
-      <BudgetDashboard 
-        itinerary={mockExpensiveItinerary} 
+      <BudgetDashboard
+        itinerary={mockExpensiveItinerary}
         budgetLimit={500}
         onApplySuggestion={onApplySuggestion}
       />
     );
-    
+
     await user.click(screen.getAllByRole('button', { name: /apply/i })[0]);
-    
+
     expect(onApplySuggestion).toHaveBeenCalled();
   });
 });
@@ -2383,7 +2383,7 @@ describe('Trip Planner API', () => {
       const response = await POST(createMockRequest({
         body: mockTripSetup,
       }));
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.itinerary).toBeDefined();
@@ -2394,7 +2394,7 @@ describe('Trip Planner API', () => {
       const response = await POST(createMockRequest({
         body: { ...mockTripSetup, travelers: { adults: 0 } },
       }));
-      
+
       expect(response.status).toBe(400);
     });
 
@@ -2402,11 +2402,11 @@ describe('Trip Planner API', () => {
       vi.mocked(mockAlgoliaSearch).mockResolvedValue(
         createMockSearchResponse(mockActivities)
       );
-      
+
       const response = await POST(createMockRequest({
         body: mockTripSetup,
       }));
-      
+
       const data = await response.json();
       data.itinerary.days.forEach(day => {
         expect(day.activities.length).toBeGreaterThan(0);
@@ -2416,18 +2416,18 @@ describe('Trip Planner API', () => {
     it('should respect pace setting', async () => {
       const relaxedSetup = { ...mockTripSetup, pace: 'relaxed' };
       const packedSetup = { ...mockTripSetup, pace: 'packed' };
-      
+
       const [relaxedRes, packedRes] = await Promise.all([
         POST(createMockRequest({ body: relaxedSetup })),
         POST(createMockRequest({ body: packedSetup })),
       ]);
-      
+
       const relaxedData = await relaxedRes.json();
       const packedData = await packedRes.json();
-      
+
       const relaxedActivities = relaxedData.itinerary.days[0].activities.length;
       const packedActivities = packedData.itinerary.days[0].activities.length;
-      
+
       expect(packedActivities).toBeGreaterThan(relaxedActivities);
     });
   });
@@ -2441,7 +2441,7 @@ describe('Trip Planner API', () => {
           message: 'Add more food activities',
         },
       }));
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.response).toBeDefined();
@@ -2453,13 +2453,13 @@ describe('Trip Planner API', () => {
         url: '/api/trip/chat',
         body: { tripId: 'trip_123', message: 'Focus on beaches' },
       }));
-      
+
       // Second message should remember context
       const response = await POST(createMockRequest({
         url: '/api/trip/chat',
         body: { tripId: 'trip_123', message: 'What about snorkeling?' },
       }));
-      
+
       const data = await response.json();
       expect(data.response).toContain(/beach|snorkel/i);
     });
@@ -2494,14 +2494,14 @@ Create `packages/frontend/src/app/api/trip/chat/route.ts`
 describe('PlannerChat', () => {
   it('should render chat interface', () => {
     render(<PlannerChat tripId="trip_123" />);
-    
+
     expect(screen.getByTestId('planner-chat')).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('should display initial greeting', () => {
     render(<PlannerChat tripId="trip_123" />);
-    
+
     expect(screen.getByText(/help you plan/i)).toBeInTheDocument();
   });
 
@@ -2510,12 +2510,12 @@ describe('PlannerChat', () => {
     vi.mocked(fetch).mockResolvedValue(
       createMockResponse({ response: 'Sure, I can help with that!' })
     );
-    
+
     render(<PlannerChat tripId="trip_123" />);
-    
+
     await user.type(screen.getByRole('textbox'), 'Add more food activities');
     await user.click(screen.getByRole('button', { name: /send/i }));
-    
+
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith('/api/trip/chat', expect.objectContaining({
         method: 'POST',
@@ -2529,12 +2529,12 @@ describe('PlannerChat', () => {
     vi.mocked(fetch).mockResolvedValue(
       createMockResponse({ response: 'I\'ve added 3 food activities!' })
     );
-    
+
     render(<PlannerChat tripId="trip_123" />);
-    
+
     await user.type(screen.getByRole('textbox'), 'Add food');
     await user.click(screen.getByRole('button', { name: /send/i }));
-    
+
     await waitFor(() => {
       expect(screen.getByText(/added 3 food activities/i)).toBeInTheDocument();
     });
@@ -2543,28 +2543,28 @@ describe('PlannerChat', () => {
   it('should show loading state while waiting for response', async () => {
     const user = userEvent.setup();
     vi.mocked(fetch).mockImplementation(() => new Promise(() => {})); // Never resolves
-    
+
     render(<PlannerChat tripId="trip_123" />);
-    
+
     await user.type(screen.getByRole('textbox'), 'Add food');
     await user.click(screen.getByRole('button', { name: /send/i }));
-    
+
     expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
   });
 
   it('should display suggestion chips', async () => {
     vi.mocked(fetch).mockResolvedValue(
-      createMockResponse({ 
+      createMockResponse({
         response: 'Here are some ideas...',
         suggestions: ['Add more beaches', 'Optimize budget', 'Show alternatives']
       })
     );
-    
+
     render(<PlannerChat tripId="trip_123" />);
-    
+
     // Trigger response
     await userEvent.setup().click(screen.getByRole('button', { name: /send/i }));
-    
+
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /add more beaches/i })).toBeInTheDocument();
     });
@@ -2601,9 +2601,9 @@ describe('ShareModal', () => {
   it('should generate shareable link', async () => {
     const user = userEvent.setup();
     render(<ShareModal tripId="trip_123" />);
-    
+
     await user.click(screen.getByRole('button', { name: /generate link/i }));
-    
+
     await waitFor(() => {
       expect(screen.getByRole('textbox', { name: /share link/i })).toHaveValue(
         expect.stringContaining('/share/trip_123')
@@ -2615,22 +2615,22 @@ describe('ShareModal', () => {
     const user = userEvent.setup();
     const mockClipboard = vi.fn();
     Object.assign(navigator, { clipboard: { writeText: mockClipboard } });
-    
+
     render(<ShareModal tripId="trip_123" />);
-    
+
     await user.click(screen.getByRole('button', { name: /generate link/i }));
     await user.click(screen.getByRole('button', { name: /copy/i }));
-    
+
     expect(mockClipboard).toHaveBeenCalled();
   });
 
   it('should allow setting permissions', async () => {
     const user = userEvent.setup();
     render(<ShareModal tripId="trip_123" />);
-    
+
     await user.click(screen.getByRole('radio', { name: /can edit/i }));
     await user.click(screen.getByRole('button', { name: /generate/i }));
-    
+
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(String),
@@ -2671,7 +2671,7 @@ describe('ExportService', () => {
   describe('generatePDF', () => {
     it('should generate PDF buffer', async () => {
       const result = await exportService.generatePDF(mockItinerary);
-      
+
       expect(result).toBeInstanceOf(Buffer);
       expect(result.length).toBeGreaterThan(0);
     });
@@ -2679,7 +2679,7 @@ describe('ExportService', () => {
     it('should include all days in PDF', async () => {
       const pdfContent = await exportService.generatePDF(mockItinerary);
       const text = await extractPDFText(pdfContent);
-      
+
       mockItinerary.days.forEach(day => {
         expect(text).toContain(`Day ${day.dayNumber}`);
         expect(text).toContain(day.theme);
@@ -2689,7 +2689,7 @@ describe('ExportService', () => {
     it('should include budget summary', async () => {
       const pdfContent = await exportService.generatePDF(mockItinerary);
       const text = await extractPDFText(pdfContent);
-      
+
       expect(text).toContain('Estimated Cost');
     });
   });
@@ -2697,19 +2697,19 @@ describe('ExportService', () => {
   describe('generateICS', () => {
     it('should generate valid ICS file', async () => {
       const result = await exportService.generateICS(mockItinerary);
-      
+
       expect(result).toContain('BEGIN:VCALENDAR');
       expect(result).toContain('END:VCALENDAR');
     });
 
     it('should include all activities as events', async () => {
       const result = await exportService.generateICS(mockItinerary);
-      
+
       const eventCount = (result.match(/BEGIN:VEVENT/g) || []).length;
       const totalActivities = mockItinerary.days.reduce(
         (sum, day) => sum + day.activities.length, 0
       );
-      
+
       expect(eventCount).toBe(totalActivities);
     });
   });
@@ -2751,7 +2751,7 @@ test.describe('Trip Planner E2E', () => {
     // Step 1: Click "Plan My Trip" button
     await page.click('text=Plan My Trip');
     await expect(page).toHaveURL(/\/plan\/dubai-uae/);
-    
+
     // Step 2: Complete trip setup wizard
     // Dates
     await expect(page.getByTestId('trip-setup-wizard')).toBeVisible();
@@ -2760,62 +2760,62 @@ test.describe('Trip Planner E2E', () => {
     await page.click('[aria-label="End date"]');
     await page.click('text=22');
     await page.click('text=Continue');
-    
+
     // Travelers
     await expect(page.getByTestId('step-travelers')).toBeVisible();
     await page.click('[aria-label="Increase adults"]');
     await page.click('text=Continue');
-    
+
     // Preferences
     await expect(page.getByTestId('step-style')).toBeVisible();
     await page.click('text=Moderate'); // Budget
     await page.click('text=Cultural Immersion');
     await page.click('text=Food & Culinary');
     await page.click('text=Continue');
-    
+
     // Review & Confirm
     await expect(page.getByTestId('step-review')).toBeVisible();
     await expect(page.getByText('Dubai')).toBeVisible();
     await expect(page.getByText('7 days')).toBeVisible();
     await page.click('text=Start Planning');
-    
+
     // Step 3: Verify itinerary generated
     await expect(page.getByTestId('itinerary-timeline')).toBeVisible({ timeout: 30000 });
     await expect(page.getByText('Day 1')).toBeVisible();
-    
+
     // Step 4: Test day expansion
     await page.click('text=Day 1');
     await expect(page.getByTestId('day-activities')).toBeVisible();
-    
+
     // Step 5: Test activity actions
     const activityCard = page.getByTestId('activity-card').first();
     await expect(activityCard).toBeVisible();
-    
+
     // Swap activity
     await activityCard.hover();
     await page.click('[aria-label="Swap activity"]');
     await expect(page.getByTestId('activity-search-modal')).toBeVisible();
     await page.keyboard.press('Escape');
-    
+
     // Step 6: Test neighborhood explorer
     await page.click('text=View Neighborhood');
     await expect(page.getByTestId('neighborhood-explorer')).toBeVisible();
     await expect(page.getByText(/nearby/i)).toBeVisible();
-    
+
     // Add POI to itinerary
     await page.click('[aria-label="Add to Day 1"]');
     await expect(page.getByRole('alert')).toContainText(/added/i);
     await page.click('[aria-label="Close"]');
-    
+
     // Step 7: Test budget dashboard
     await expect(page.getByTestId('budget-dashboard')).toBeVisible();
     await expect(page.getByText(/estimated cost/i)).toBeVisible();
-    
+
     // Step 8: Test AI chat
     await page.fill('[data-testid="planner-chat-input"]', 'Add more food activities');
     await page.click('[aria-label="Send message"]');
     await expect(page.getByTestId('ai-response')).toBeVisible({ timeout: 15000 });
-    
+
     // Step 9: Test export
     await page.click('text=Export');
     await expect(page.getByText('PDF')).toBeVisible();
@@ -2824,15 +2824,15 @@ test.describe('Trip Planner E2E', () => {
 
   test('Wizard navigation - back button preserves state', async ({ page }) => {
     await page.click('text=Plan My Trip');
-    
+
     // Fill step 1
     await page.click('[aria-label="Start date"]');
     await page.click('text=15');
     await page.click('text=Continue');
-    
+
     // Go back
     await page.click('text=Back');
-    
+
     // Verify date is still selected
     await expect(page.getByText('15').first()).toHaveClass(/selected/);
   });
@@ -2840,34 +2840,34 @@ test.describe('Trip Planner E2E', () => {
   test('Mobile responsive trip planner', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.click('text=Plan My Trip');
-    
+
     // Wizard should be visible and usable on mobile
     await expect(page.getByTestId('trip-setup-wizard')).toBeVisible();
-    
+
     // Complete wizard
     await page.click('[aria-label="Start date"]');
     await page.click('text=15');
     await page.click('[aria-label="End date"]');
     await page.click('text=22');
     await page.click('text=Continue');
-    
+
     // Mobile layout should show bottom navigation
     await expect(page.getByTestId('mobile-nav')).toBeVisible();
   });
 
   test('Error handling - invalid dates', async ({ page }) => {
     await page.click('text=Plan My Trip');
-    
+
     // Try to continue without selecting dates
     await page.click('text=Continue');
-    
+
     // Should show validation error
     await expect(page.getByText(/select dates/i)).toBeVisible();
   });
 
   test('Persistence - reload preserves trip', async ({ page }) => {
     await page.click('text=Plan My Trip');
-    
+
     // Complete setup
     await page.click('[aria-label="Start date"]');
     await page.click('text=15');
@@ -2879,12 +2879,12 @@ test.describe('Trip Planner E2E', () => {
     await page.click('text=Cultural Immersion');
     await page.click('text=Continue');
     await page.click('text=Start Planning');
-    
+
     await expect(page.getByTestId('itinerary-timeline')).toBeVisible({ timeout: 30000 });
-    
+
     // Reload page
     await page.reload();
-    
+
     // Trip should still be visible
     await expect(page.getByTestId('itinerary-timeline')).toBeVisible();
     await expect(page.getByText('Day 1')).toBeVisible();
@@ -2895,36 +2895,36 @@ test.describe('Trip Planner Accessibility', () => {
   test('Keyboard navigation through wizard', async ({ page }) => {
     await page.goto('/city/dubai-uae');
     await page.click('text=Plan My Trip');
-    
+
     // Navigate with keyboard
     await page.keyboard.press('Tab');
     await page.keyboard.press('Enter'); // Open date picker
     await page.keyboard.press('ArrowRight'); // Next day
     await page.keyboard.press('Enter'); // Select
-    
+
     // Continue with keyboard
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Enter'); // Continue button
-    
+
     await expect(page.getByTestId('step-travelers')).toBeVisible();
   });
 
   test('Screen reader announcements', async ({ page }) => {
     await page.goto('/city/dubai-uae');
     await page.click('text=Plan My Trip');
-    
+
     // Check for live region announcements
     const liveRegion = page.locator('[aria-live="polite"]');
     await expect(liveRegion).toBeVisible();
-    
+
     // Navigate to next step
     await page.click('[aria-label="Start date"]');
     await page.click('text=15');
     await page.click('[aria-label="End date"]');
     await page.click('text=22');
     await page.click('text=Continue');
-    
+
     // Should announce new step
     await expect(liveRegion).toContainText(/step 2|travelers/i);
   });
@@ -2956,7 +2956,7 @@ describe('Trip Planner Integration', () => {
         <ItineraryDisplay />
       </TripPlannerProvider>
     );
-    
+
     // Complete wizard...
     // Verify itinerary receives data
     await waitFor(() => {
@@ -2971,13 +2971,13 @@ describe('Trip Planner Integration', () => {
         <BudgetDashboard />
       </TripPlannerProvider>
     );
-    
+
     const initialBudget = getByTestId('total-cost').textContent;
-    
+
     // Add activity
     await userEvent.click(getByRole('button', { name: /add activity/i }));
     // ... select activity
-    
+
     await waitFor(() => {
       expect(getByTestId('total-cost').textContent).not.toBe(initialBudget);
     });
@@ -2985,20 +2985,20 @@ describe('Trip Planner Integration', () => {
 
   it('should sync neighborhood explorer with map', async () => {
     const mapHighlight = vi.fn();
-    
+
     const { getByTestId } = render(
       <TripPlannerProvider>
-        <NeighborhoodExplorer 
+        <NeighborhoodExplorer
           center={mockCenter}
           onHighlightPOI={mapHighlight}
         />
         <MapView onHighlight={mapHighlight} />
       </TripPlannerProvider>
     );
-    
+
     // Hover POI
     await userEvent.hover(getByTestId('poi-card'));
-    
+
     expect(mapHighlight).toHaveBeenCalled();
   });
 });
@@ -3082,7 +3082,7 @@ pnpm test:all
 # Run unit tests only
 pnpm test:unit
 
-# Run E2E tests only  
+# Run E2E tests only
 pnpm test:e2e
 
 # Run tests with coverage

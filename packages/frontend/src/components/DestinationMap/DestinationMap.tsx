@@ -49,7 +49,6 @@ export function DestinationMap({
   const {
     stops,
     coordinates,
-    toggleStop,
     isInItinerary,
     clearItinerary,
     totalStops
@@ -155,12 +154,6 @@ export function DestinationMap({
     }
   }, [popupCity, onCityClick]);
 
-  const handleAddToItinerary = useCallback(() => {
-    if (popupCity) {
-      toggleStop(popupCity);
-    }
-  }, [popupCity, toggleStop]);
-
   if (!mapboxToken) {
     return (
       <div className={`${styles.mapContainer} ${className || ''}`}>
@@ -205,9 +198,10 @@ export function DestinationMap({
             city={popupCity}
             onClose={handlePopupClose}
             onViewDetails={handlePopupViewDetails}
-            onAskInChat={onAskInChat}
-            onAddToItinerary={showItinerary ? handleAddToItinerary : undefined}
-            isInItinerary={popupCity ? isInItinerary(popupCity.objectID) : false}
+            onAskInChat={(query) => {
+              onAskInChat?.(query);
+              setPopupCity(null);
+            }}
           />
         )}
       </Map>

@@ -564,7 +564,7 @@ function selectActivitiesForDay(
   if (afternoonActivities.length > 0 && selected.length < targetCount) {
     const idx = dayNumber % afternoonActivities.length;
     selected.push(afternoonActivities[idx]);
-    
+
     if (pace === 'packed' && afternoonActivities.length > 1 && selected.length < targetCount) {
       const idx2 = (dayNumber + 1) % afternoonActivities.length;
       if (idx2 !== idx) {
@@ -584,7 +584,7 @@ function selectActivitiesForDay(
       (a) => !selected.some((s) => s.name === a.name)
     );
     if (remaining.length === 0) break;
-    
+
     const idx = (dayNumber + selected.length) % remaining.length;
     selected.push(remaining[idx]);
   }
